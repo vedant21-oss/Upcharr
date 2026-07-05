@@ -1093,6 +1093,380 @@ button, input, select, textarea {
 }
 
 /* ==========================================================================
+   INTERACTIVE BOOKING MODAL (SLIDE-OVER DRAWERS STYLE)
+   ========================================================================== */
+.booking-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(10, 14, 20, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-end; /* Slide in from right */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.booking-modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.booking-modal-container {
+  width: 100%;
+  max-width: 500px;
+  height: 100%;
+  background-color: var(--bg-primary);
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  flex-direction: column;
+  padding: 40px;
+  overflow-y: auto;
+  position: relative;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.booking-modal-overlay.open .booking-modal-container {
+  transform: translateX(0);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.modal-close-btn:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* Booking Wizard Styling */
+.booking-wizard {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin-top: 20px;
+}
+
+.wizard-steps-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 16px;
+}
+
+.step-indicator {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  transition: var(--transition);
+}
+
+.step-indicator.active {
+  color: var(--accent-color);
+}
+
+.step-indicator.completed {
+  color: var(--text-primary);
+}
+
+.step-line {
+  height: 1px;
+  background-color: var(--border-color);
+  flex-grow: 1;
+  margin: 0 12px;
+}
+
+/* Selected Doctor Profile Summary in Modal */
+.selected-doctor-profile {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  border-radius: var(--radius-md);
+  margin-bottom: 32px;
+}
+
+.modal-doctor-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.modal-doctor-avatar svg {
+  width: 100%;
+  height: 100%;
+}
+
+.selected-doctor-profile h4 {
+  font-family: var(--font-title);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.selected-doctor-profile p {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Wizard Step Panes */
+.wizard-step-pane {
+  display: none;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.wizard-step-pane.active {
+  display: flex;
+  animation: fade-in 0.3s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.wizard-step-pane h3 {
+  font-family: var(--font-title);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.margin-top-md {
+  margin-top: 32px;
+}
+
+/* Calendar Date Selector Grid */
+.date-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.calendar-day-btn {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.calendar-day-btn:hover:not(.disabled) {
+  border-color: var(--border-color-hover);
+  background-color: var(--bg-secondary);
+}
+
+.calendar-day-btn.selected {
+  border-color: var(--accent-color);
+  background-color: var(--accent-light);
+  color: var(--accent-color);
+}
+
+.calendar-day-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.calendar-day-btn .day-name {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 4px;
+}
+
+.calendar-day-btn.selected .day-name {
+  color: var(--accent-color);
+}
+
+.calendar-day-btn .day-number {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* Time Slot Selection */
+.time-slots-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.time-slot-btn {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.time-slot-btn:hover:not(.disabled) {
+  border-color: var(--border-color-hover);
+}
+
+.time-slot-btn.selected {
+  background-color: var(--text-primary);
+  border-color: var(--text-primary);
+  color: var(--bg-primary);
+}
+
+.time-slot-btn.disabled {
+  opacity: 0.3;
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+/* Form Styles */
+.booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.form-group input, .form-group textarea {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  outline: none;
+  transition: var(--transition);
+}
+
+.form-group input:focus, .form-group textarea:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+/* Success Confirmation Screen */
+.success-screen {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.success-icon-wrapper {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: var(--success-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.success-screen h2 {
+  font-family: var(--font-title);
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.success-screen p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+.booking-receipt-card {
+  width: 100%;
+  background-color: var(--bg-secondary);
+  border: 1px dashed var(--border-color-hover);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.receipt-row .label {
+  color: var(--text-secondary);
+}
+
+.receipt-row .value {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Wizard Footer */
+.wizard-footer {
+  margin-top: 40px;
+  display: flex;
+  gap: 12px;
+}
+
+.width-full {
+  width: 100%;
+}
+
+.flex-column {
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ==========================================================================
    FLOATING AI ASSISTANT CHATBOT (WOW FEATURE)
    ========================================================================== */
 .floating-ai-trigger {
