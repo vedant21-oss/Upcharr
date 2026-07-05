@@ -1,48 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Upchaar Clinic - Premium Healthcare and Seamless Doctor Bookings. Healthcare designed for your well-being.">
-  <title>Upchaar Clinic - Healthcare Designed For You</title>
+  <meta name="description" content="Upchaar - AI-Powered Smart Clinic Management Platform. Manage appointments, voice-to-prescription, ABHA, patient records, and real-time queues.">
+  <title>Upchaar - Intelligent Clinic Management Platform</title>
   
-  <!-- Premium Fonts from Google Fonts -->
+  <!-- Premium Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Main Stylesheet -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Navigation Bar -->
-  <header class="navbar">
+  <!-- Sticky Navbar -->
+  <header class="navbar" id="navbar">
     <div class="nav-container">
       <a href="#" class="logo">
-        <span class="logo-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M19 10.5C19 15.19 12 21 12 21C12 21 5 15.19 5 10.5C5 6.35786 8.13401 3 12 3C15.866 3 19 6.35786 19 10.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M12 7V14M9.5 10.5H14.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <span class="logo-symbol">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
           </svg>
         </span>
-        <span class="logo-text">Upchaar</span>
+        <span class="logo-text" data-tr="brand">Upchaar</span>
       </a>
       
       <nav class="nav-links">
-        <a href="#services" class="nav-link">Specialties</a>
-        <a href="#doctors" class="nav-link">Our Doctors</a>
-        <a href="#features" class="nav-link">Why Choose Us</a>
-        <a href="#about" class="nav-link">About</a>
+        <a href="#" class="nav-link" data-tr="nav_home">Home</a>
+        <a href="#features" class="nav-link" data-tr="nav_features">Features</a>
+        <a href="#dashboards" class="nav-link" data-tr="nav_dashboards">Dashboard</a>
+        <a href="#analytics" class="nav-link" data-tr="nav_analytics">AI Analytics</a>
+        <a href="#doctors" class="nav-link" data-tr="nav_doctors">Doctors</a>
+        <a href="#contact" class="nav-link" data-tr="nav_contact">Contact</a>
       </nav>
       
       <div class="nav-actions">
-        <a href="#doctors" class="btn btn-primary btn-book-trigger">Book Appointment</a>
+        <!-- Language Switcher -->
+        <select class="lang-selector" id="langSelector" aria-label="Change Language">
+          <option value="en">EN</option>
+          <option value="hi">HI (हिंदी)</option>
+          <option value="mr">MR (मराठी)</option>
+          <option value="gu">GU (ગુજરાતી)</option>
+        </select>
+        
+        <!-- Theme Toggle -->
+        <button class="nav-control-btn" id="themeToggle" aria-label="Toggle Theme">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" class="theme-sun-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+          </svg>
+        </button>
+        
+        <button class="btn btn-primary btn-book-trigger" data-tr="cta_book">Book Appointment</button>
       </div>
       
-      <button class="mobile-menu-toggle" aria-label="Toggle navigation menu">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M4 6H20M4 12H20M4 18H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <button class="mobile-toggle nav-control-btn" id="mobileNavToggle" aria-label="Open navigation menu">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M4 6h16M4 12h16M4 18h16"/>
         </svg>
       </button>
     </div>
@@ -51,159 +68,491 @@
   <main>
     <!-- Hero Section -->
     <section class="hero">
-      <div class="hero-container">
-        <div class="hero-content">
-          <span class="badge">Care you can trust</span>
-          <h1>Healthcare designed for your well-being.</h1>
-          <p>Book appointments with leading doctors and medical specialists. Experience premium, personalized, and hassle-free clinic care tailored to your lifestyle.</p>
+      <div class="glow-circle" style="top: -100px; left: -100px;"></div>
+      <div class="container hero-layout">
+        <div class="hero-text">
+          <span class="badge">
+            <span class="badge-dot"></span>
+            <span data-tr="hero_badge">Next-Generation Clinic Operating System</span>
+          </span>
+          <h1 data-tr="hero_title">Healthcare Reimagined with <span>Artificial Intelligence</span></h1>
+          <p data-tr="hero_subheading">Manage appointments, digital prescriptions, patient records, ABHA integration, AI medical assistance, multilingual support, smart queue management, and complete clinic operations—all in one intelligent platform.</p>
           
-          <!-- Quick Search/Book Widget -->
-          <div class="quick-book-widget">
-            <div class="widget-field">
-              <label for="widget-specialty">Specialty</label>
-              <select id="widget-specialty">
-                <option value="">Select specialty</option>
-                <option value="General Physician">General Physician</option>
-                <option value="Pediatrics">Pediatrics</option>
-                <option value="Cardiology">Cardiology</option>
-                <option value="Dermatology">Dermatology</option>
-                <option value="Orthopedics">Orthopedics</option>
-              </select>
-            </div>
-            <div class="widget-divider"></div>
-            <div class="widget-field">
-              <label for="widget-doctor">Doctor</label>
-              <select id="widget-doctor" disabled>
-                <option value="">Select doctor</option>
-              </select>
-            </div>
-            <button class="btn btn-accent" id="btn-quick-book">Find Slot</button>
+          <div class="hero-buttons">
+            <button class="btn btn-accent btn-book-trigger" data-tr="cta_book">Book Appointment</button>
+            <button class="btn btn-secondary" id="watchDemoBtn" data-tr="cta_demo">Watch Demo</button>
           </div>
           
-          <div class="hero-stats">
-            <div class="stat-item">
-              <span class="stat-num">15+</span>
-              <span class="stat-lbl">Specialists</span>
+          <div class="hero-counters">
+            <div class="counter-item">
+              <span class="counter-val" id="count-wait">9 min</span>
+              <span class="counter-lbl" data-tr="hero_stat_wait">Avg Waiting Time</span>
             </div>
-            <div class="stat-item">
-              <span class="stat-num">10k+</span>
-              <span class="stat-lbl">Happy Patients</span>
+            <div class="counter-item">
+              <span class="counter-val" id="count-satisfaction">99.4%</span>
+              <span class="counter-lbl" data-tr="hero_stat_happy">Patient Satisfaction</span>
             </div>
-            <div class="stat-item">
-              <span class="stat-num">4.9★</span>
-              <span class="stat-lbl">Average Rating</span>
+            <div class="counter-item">
+              <span class="counter-val" id="count-consult">1.2M+</span>
+              <span class="counter-lbl" data-tr="hero_stat_consult">Consultations Made</span>
             </div>
           </div>
         </div>
         
-        <div class="hero-visual">
-          <div class="visual-card main-card">
-            <!-- Modern Minimal Clinic Graphic -->
-            <svg viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg" class="clinic-svg-graphic">
-              <!-- Minimal abstract grid background -->
-              <circle cx="250" cy="250" r="230" fill="#fafafa" />
-              <circle cx="250" cy="250" r="180" stroke="#f0f0f0" stroke-width="1" stroke-dasharray="4 4" />
-              
-              <!-- Abstract health lines -->
-              <path d="M100 280 H 180 L 195 240 L 210 320 L 225 260 L 235 295 L 245 280 H 400" stroke="#0e9384" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="heart-pulse-line"/>
-              
-              <!-- Floating graphic element: booking confirmation -->
-              <g class="floating-bubble-1">
-                <rect x="300" y="80" width="160" height="70" rx="16" fill="white" filter="drop-shadow(0px 8px 24px rgba(0, 0, 0, 0.04))"/>
-                <circle cx="330" cy="115" r="16" fill="#ecfdf3" />
-                <path d="M325 115 L 328 118 L 335 111" stroke="#039855" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <text x="356" y="112" fill="#111111" font-family="Plus Jakarta Sans" font-size="12" font-weight="600">Booking Confirmed</text>
-                <text x="356" y="126" fill="#667085" font-family="Plus Jakarta Sans" font-size="10">9:30 AM Tomorrow</text>
-              </g>
-              
-              <!-- Floating graphic element: rating -->
-              <g class="floating-bubble-2">
-                <rect x="40" y="140" width="140" height="60" rx="16" fill="white" filter="drop-shadow(0px 8px 24px rgba(0, 0, 0, 0.04))"/>
-                <circle cx="70" cy="170" r="16" fill="#fef0c7" />
-                <path d="M70 162 L 72.35 166.76 L 77.6 167.52 L 73.8 171.22 L 74.7 176.45 L 70 174 L 65.3 176.45 L 66.2 171.22 L 62.4 167.52 L 67.65 166.76 L 70 162 Z" fill="#dc6803"/>
-                <text x="96" y="167" fill="#111111" font-family="Plus Jakarta Sans" font-size="12" font-weight="600">Top Rated Care</text>
-                <text x="96" y="180" fill="#dc6803" font-family="Plus Jakarta Sans" font-size="11" font-weight="600">4.9 (1,200+ reviews)</text>
-              </g>
+        <div class="hero-illustration">
+          <div class="illustration-canvas">
+            <div class="glow-circle" style="top: 10%; right: 10%;"></div>
+            
+            <!-- ECG Wave animation -->
+            <svg class="ecg-svg" viewBox="0 0 500 120">
+              <path class="ecg-path" d="M 0 60 H 120 L 135 20 L 150 100 L 165 40 L 175 75 L 185 60 H 320 L 335 20 L 350 100 L 365 40 L 375 75 L 385 60 H 500" />
             </svg>
+            
+            <!-- Voice wave rings -->
+            <div class="voice-wave-wrapper">
+              <div class="voice-bar"></div>
+              <div class="voice-bar"></div>
+              <div class="voice-bar"></div>
+              <div class="voice-bar"></div>
+              <div class="voice-bar"></div>
+            </div>
+            
+            <!-- HUD floating items -->
+            <div class="hud-card hud-card-1 glass-card">
+              <div class="hud-card-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div>
+                <p style="margin: 0; font-size: 11px; opacity: 0.6;" data-tr="hud_queue_lbl">Queue Status</p>
+                <strong data-tr="hud_queue_val">Dr. Sharma (2 Patients)</strong>
+              </div>
+            </div>
+
+            <div class="hud-card hud-card-2 glass-card">
+              <div class="hud-card-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div>
+                <p style="margin: 0; font-size: 11px; opacity: 0.6;" data-tr="hud_abha_lbl">ABHA Sync Status</p>
+                <strong data-tr="hud_abha_val">Encrypted & Secure</strong>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Specialties/Services Section -->
-    <section id="services" class="services">
+    <!-- Features Section -->
+    <section id="features" class="features">
       <div class="container">
-        <div class="section-header">
-          <h2>Our Specialties</h2>
-          <p>We provide comprehensive medical services to address you and your family's healthcare requirements.</p>
+        <div class="section-header reveal">
+          <span class="badge" data-tr="features_badge">Platform Features</span>
+          <h2 data-tr="features_title">10 Smart AI Tools for Modern Clinics</h2>
+          <p data-tr="features_subheading">Explore all our unified intelligent platform modules, specifically designed to automate management and administrative tasks.</p>
         </div>
         
-        <div class="services-grid">
-          <!-- Card 1 -->
-          <div class="service-card" data-specialty="General Physician">
-            <div class="service-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-              </svg>
+        <div class="features-grid">
+          <!-- Card 1: AI Voice to Digital Prescription -->
+          <div class="feature-box glass-card reveal">
+            <div class="feature-box-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>
             </div>
-            <h3>General Medicine</h3>
-            <p>Comprehensive primary care, health screenings, and wellness programs for all age groups.</p>
-            <span class="learn-more">Find Doctors &rarr;</span>
+            <h3 data-tr="feat_voice_title">AI Voice Prescription</h3>
+            <p data-tr="feat_voice_desc">Doctor speaks naturally. Our AI automatically extracts symptoms, diagnosis, and medicines, generating digital prescriptions.</p>
+            <div class="feature-sandbox">
+              <div class="mic-record-btn" id="voiceMicBtn">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/></svg>
+              </div>
+              <div class="prescription-preview-box" id="voicePrescriptionResult" data-tr="feat_voice_sandbox">
+                Click microphone to simulate doctor speaking...
+              </div>
+            </div>
           </div>
 
-          <!-- Card 2 -->
-          <div class="service-card" data-specialty="Pediatrics">
-            <div class="service-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="8" r="5"/>
-                <path d="M3 21v-2a7 7 0 0 1 12.54-4.3"/>
-                <path d="M19 18v3M19 15v.01"/>
-              </svg>
+          <!-- Card 2: ABHA Integration -->
+          <div class="feature-box glass-card reveal">
+            <div class="feature-box-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
-            <h3>Pediatrics</h3>
-            <p>Specialized physical, emotional, and behavioral medical care for infants, children, and teens.</p>
-            <span class="learn-more">Find Doctors &rarr;</span>
+            <h3 data-tr="feat_abha_title">ABHA Integration</h3>
+            <p data-tr="feat_abha_desc">Link profiles using government-standard ABHA Health IDs. Fetch medical records, previous vaccinations, and clinic reports securely.</p>
+            <div class="feature-sandbox">
+              <div class="abha-input-group">
+                <input type="text" id="abhaIdInput" placeholder="Enter ABHA ID (e.g. 12-3456-7890)">
+                <button class="btn btn-accent" id="abhaVerifyBtn" style="padding: 6px 12px; font-size: 11px;">Verify</button>
+              </div>
+              <div class="prescription-preview-box" id="abhaRecordOutput" data-tr="feat_abha_sandbox">
+                Retrieve government records instantly...
+              </div>
+            </div>
           </div>
 
-          <!-- Card 3 -->
-          <div class="service-card" data-specialty="Cardiology">
-            <div class="service-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-              </svg>
+          <!-- Card 3: Patient Record Management -->
+          <div class="feature-box glass-card reveal">
+            <div class="feature-box-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
             </div>
-            <h3>Cardiology</h3>
-            <p>Expert evaluation, diagnostic screening, and management of complex cardiovascular systems.</p>
-            <span class="learn-more">Find Doctors &rarr;</span>
+            <h3 data-tr="feat_records_title">Digital Patient Profiles</h3>
+            <p data-tr="feat_records_desc">Unified chronological health timeline displaying previous visits, lab results, allergies, and family history in one screen.</p>
+            <div class="feature-sandbox">
+              <select id="patientProfileSelector" class="lang-selector" style="width: 100%; font-size: 12px;">
+                <option value="rahul">Rahul Verma (ID: 88402)</option>
+                <option value="priya">Priya Sen (ID: 92384)</option>
+              </select>
+              <div class="prescription-preview-box" id="patientProfileOutput">
+                Age: 28 | BP: 120/80 | History: Asthma
+              </div>
+            </div>
           </div>
 
-          <!-- Card 4 -->
-          <div class="service-card" data-specialty="Dermatology">
-            <div class="service-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 2a5 5 0 0 0-5 5v3a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5z"/>
-                <path d="M20 13a8 8 0 0 1-16 0"/>
-                <path d="M4 17h16"/>
-              </svg>
+          <!-- Card 4: Smart Appointment Management -->
+          <div class="feature-box glass-card reveal">
+            <div class="feature-box-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             </div>
-            <h3>Dermatology</h3>
-            <p>Clinical treatment for skin conditions, pediatric dermatology, and cosmetic therapies.</p>
-            <span class="learn-more">Find Doctors &rarr;</span>
+            <h3 data-tr="feat_appoint_title">Smart Appointment Calendars</h3>
+            <p data-tr="feat_appoint_desc">Book or reschedule slots instantly. Automatic alerts ensure sync with Google Calendar and local reception terminals.</p>
+            <div class="feature-sandbox">
+              <button class="btn btn-secondary btn-book-trigger" style="width: 100%; padding: 10px; font-size: 12px;" data-tr="cta_book">Launch Slot Calendar</button>
+            </div>
           </div>
 
-          <!-- Card 5 -->
-          <div class="service-card" data-specialty="Orthopedics">
-            <div class="service-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M6 18h12"/>
-                <path d="M12 22V2"/>
-                <path d="m17 7-5-5-5 5"/>
-                <path d="m17 17-5 5-5-5"/>
-              </svg>
+          <!-- Card 5: Live Queue Management -->
+          <div class="feature-box glass-card reveal">
+            <div class="feature-box-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             </div>
-            <h3>Orthopedics</h3>
-            <p>Surgical and non-surgical therapies for joint issues, bone fractures, and muscle disorders.</p>
-            <span class="learn-more">Find Doctors &rarr;</span>
+            <h3 data-tr="feat_queue_title">Live Waiting Queue</h3>
+            <p data-tr="feat_queue_desc">Reduce clinic bottlenecks. Patients track live queue placement and estimated consult waiting times from home.</p>
+            <div class="feature-sandbox">
+              <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 11px;">
+                <span data-tr="feat_queue_curr">Current Active Token:</span>
+                <span id="queueActiveToken">#A-14</span>
+              </div>
+              <div style="background-color: var(--bg-secondary); border-radius: 100px; height: 8px; overflow: hidden;">
+                <div style="background-color: var(--accent-color); width: 65%; height: 100%; transition: width 0.5s;"></div>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; opacity: 0.8;">
+                <span data-tr="feat_queue_est">Estimated Wait:</span>
+                <span id="queueEstWait">12 mins</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 6: AI Medical Assistant -->
+          <div class="feature-box glass-card reveal">
+            <div class="feature-box-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <h3 data-tr="feat_ai_title">24/7 AI Health Companion</h3>
+            <p data-tr="feat_ai_desc">Instant chat for symptom checks, calendar booking guidelines, prescription reminders, and clinic FAQ responses.</p>
+            <div class="feature-sandbox">
+              <button class="btn btn-primary" id="openChatSandboxBtn" style="width: 100%; padding: 10px; font-size: 12px;" data-tr="feat_ai_btn">Chat with AI Assistant</button>
+            </div>
+          </div>
+
+          <!-- Card 7: Digital Health Locker -->
+          <div class="feature-box glass-card reveal">
+            <div class="feature-box-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <h3 data-tr="feat_locker_title">Digital Health Locker</h3>
+            <p data-tr="feat_locker_desc">Store and index prescriptions, blood test sheets, MRI scans, and clinic bills. Everything is encrypted and connected to your ABHA profile.</p>
+            <div class="feature-sandbox">
+              <div class="ocr-upload-zone" id="lockerDropzone" style="padding: 10px;">
+                <span style="font-size: 11px;" data-tr="feat_locker_click">Click to upload mock reports</span>
+              </div>
+              <div id="lockerFileList" style="display: flex; flex-direction: column; gap: 4px; font-size: 11px;">
+                <div style="display: flex; justify-content: space-between; background: var(--bg-secondary); padding: 4px 8px; border-radius: 4px;">
+                  <span>BloodReport_July.pdf</span>
+                  <span style="color: var(--accent-color);">✓ Encrypted</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 8: OCR Prescription Scanner -->
+          <div class="feature-box glass-card reveal">
+            <div class="feature-box-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </div>
+            <h3 data-tr="feat_ocr_title">AI Prescription OCR</h3>
+            <p data-tr="feat_ocr_desc">Scan and digitize handwriting. AI analyzes scanned pages to extract doctor credentials, names, and medicines.</p>
+            <div class="feature-sandbox">
+              <button class="btn btn-secondary" id="simulateOcrBtn" style="width: 100%; padding: 10px; font-size: 12px;" data-tr="feat_ocr_btn">Simulate Scanning Doctor Note</button>
+              <div class="prescription-preview-box" id="ocrOutputResult">
+                Awaiting OCR upload...
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 9: QR Smart Check-in -->
+          <div class="feature-box glass-card reveal">
+            <div class="feature-box-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><rect x="7" y="7" width="3" height="3"/><rect x="14" y="7" width="3" height="3"/><rect x="7" y="14" width="3" height="3"/></svg>
+            </div>
+            <h3 data-tr="feat_qr_title">QR Smart Check-in</h3>
+            <p data-tr="feat_qr_desc">Fast contactless check-ins. Patients scan their check-in codes at the front desk to automatically log arrival and update the queue.</p>
+            <div class="feature-sandbox" style="align-items: center;">
+              <button class="btn btn-accent" id="generateQrBtn" style="width: 100%; padding: 8px; font-size: 11px;" data-tr="feat_qr_btn">Generate My Check-in QR</button>
+              <div id="qrCodeContainer" style="display: none; padding: 10px; background: white; border-radius: 8px;">
+                <!-- Simulated QR code via SVG -->
+                <svg width="60" height="60" viewBox="0 0 60 60" fill="currentColor">
+                  <path d="M0 0h20v20H0zM5 5v10h10V5zm35-5h20v20H40zM45 5v10h10V5zM0 40h20v20H0zM5 45v10h10V5zM25 25h10v10H25zm15 15h10v5H40zm10 10h10v10H50z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 10: Multi-language Support -->
+          <div class="feature-box glass-card reveal">
+            <div class="feature-box-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <h3 data-tr="feat_lang_title">Multi-Language Engines</h3>
+            <p data-tr="feat_lang_desc">Instant localized layouts. Change site language dynamically, making UI accessible in regional languages.</p>
+            <div class="feature-sandbox">
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
+                <button class="btn btn-secondary lang-select-btn" data-lang="en" style="padding: 6px; font-size: 11px;">English</button>
+                <button class="btn btn-secondary lang-select-btn" data-lang="hi" style="padding: 6px; font-size: 11px;">Hindi</button>
+                <button class="btn btn-secondary lang-select-btn" data-lang="mr" style="padding: 6px; font-size: 11px;">Marathi</button>
+                <button class="btn btn-secondary lang-select-btn" data-lang="gu" style="padding: 6px; font-size: 11px;">Gujarati</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Role-Based Dashboard Section -->
+    <section id="dashboards" class="dashboards">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="badge" data-tr="dash_badge">Role Previews</span>
+          <h2 data-tr="dash_title">Interactive Roles Console</h2>
+          <p data-tr="dash_subheading">Switch roles below to explore distinct operational perspectives configured for clinicians, receptionists, and patient users.</p>
+        </div>
+        
+        <!-- Segment control tabs -->
+        <div class="dash-control-tabs reveal">
+          <button class="dash-tab-btn active" data-role="doctor" data-tr="dash_tab_doctor">Doctor Dashboard</button>
+          <button class="dash-tab-btn" data-role="reception" data-tr="dash_tab_reception">Reception Dashboard</button>
+          <button class="dash-tab-btn" data-role="patient" data-tr="dash_tab_patient">Patient Dashboard</button>
+        </div>
+        
+        <!-- Viewport -->
+        <div class="dashboard-viewport reveal">
+          
+          <!-- Doctor Dashboard Screen -->
+          <div class="dashboard-screen active" id="screen-doctor">
+            <aside class="dash-sidebar">
+              <div class="sidebar-title">Upchaar OS</div>
+              <ul class="sidebar-menu">
+                <li class="sidebar-item active">Patients</li>
+                <li class="sidebar-item">AI Diagnostics</li>
+                <li class="sidebar-item">Analytics</li>
+                <li class="sidebar-item">Settings</li>
+              </ul>
+            </aside>
+            <div class="dash-content">
+              <div class="dash-header">
+                <div>
+                  <h2 data-tr="dash_doc_title">Dr. Aarav Sharma</h2>
+                  <p style="font-size: 13px; color: var(--text-secondary);" data-tr="dash_doc_sub">OPD Terminal &bull; Cardiology Division</p>
+                </div>
+                <span class="badge" style="margin: 0;" data-tr="dash_doc_active">Active Duty</span>
+              </div>
+              
+              <div class="dash-stats-row">
+                <div class="dash-stat-card">
+                  <div class="label" data-tr="dash_stat_today">Today's Patients</div>
+                  <div class="value" id="stats-doc-patients">18</div>
+                </div>
+                <div class="dash-stat-card">
+                  <div class="label" data-tr="dash_stat_revenue">Today's Revenue</div>
+                  <div class="value">₹14,200</div>
+                </div>
+                <div class="dash-stat-card">
+                  <div class="label" data-tr="dash_stat_active">Queue Waiting</div>
+                  <div class="value">2 Patients</div>
+                </div>
+              </div>
+              
+              <div class="glass-card" style="padding: 24px;">
+                <h4 style="margin-bottom: 16px;" data-tr="dash_doc_patient_list">Today's Appointments Queue</h4>
+                <div style="display: flex; flex-direction: column; gap: 12px;" id="doctorPatientList">
+                  <!-- JS generated patients lists -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reception Dashboard Screen -->
+          <div class="dashboard-screen" id="screen-reception">
+            <aside class="dash-sidebar">
+              <div class="sidebar-title">Upchaar OS</div>
+              <ul class="sidebar-menu">
+                <li class="sidebar-item active">Reception Queue</li>
+                <li class="sidebar-item">Walk-in Registry</li>
+                <li class="sidebar-item">Payments</li>
+              </ul>
+            </aside>
+            <div class="dash-content">
+              <div class="dash-header">
+                <div>
+                  <h2 data-tr="dash_rec_title">Reception Terminal</h2>
+                  <p style="font-size: 13px; color: var(--text-secondary);" data-tr="dash_rec_sub">Front Desk Operations &bull; Main Lobby</p>
+                </div>
+              </div>
+              
+              <div class="dash-stats-row">
+                <div class="dash-stat-card">
+                  <div class="label" data-tr="dash_rec_total">Total Checked In</div>
+                  <div class="value">34</div>
+                </div>
+                <div class="dash-stat-card">
+                  <div class="label" data-tr="dash_rec_waiting">Average Wait</div>
+                  <div class="value">9 min</div>
+                </div>
+                <div class="dash-stat-card">
+                  <div class="label" data-tr="dash_rec_collected">Bills Generated</div>
+                  <div class="value">29</div>
+                </div>
+              </div>
+
+              <!-- Interactive walk-in check in widget -->
+              <div class="glass-card" style="padding: 24px;">
+                <h4 style="margin-bottom: 16px;" data-tr="dash_rec_walkin_title">Walk-In Patient Check-In</h4>
+                <form id="receptionCheckinForm" style="display: grid; grid-template-columns: 1.5fr 1.5fr 1fr; gap: 16px; align-items: flex-end;">
+                  <div class="form-group">
+                    <label for="recPatientName" style="font-size: 11px;" data-tr="dash_rec_name_lbl">Patient Name</label>
+                    <input type="text" id="recPatientName" required placeholder="Name" style="padding: 8px 12px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px;">
+                  </div>
+                  <div class="form-group">
+                    <label for="recDoctorSelect" style="font-size: 11px;" data-tr="dash_rec_doc_lbl">Select Doctor</label>
+                    <select id="recDoctorSelect" style="padding: 8px 12px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; width: 100%;">
+                      <option value="dr-sharma">Dr. Aarav Sharma</option>
+                      <option value="dr-patel">Dr. Ananya Patel</option>
+                    </select>
+                  </div>
+                  <button type="submit" class="btn btn-accent" style="padding: 10px;" data-tr="dash_rec_btn">Generate Token</button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Patient Dashboard Screen -->
+          <div class="dashboard-screen" id="screen-patient">
+            <aside class="dash-sidebar">
+              <div class="sidebar-title">Upchaar OS</div>
+              <ul class="sidebar-menu">
+                <li class="sidebar-item active">My Health Lock</li>
+                <li class="sidebar-item">Appointments</li>
+                <li class="sidebar-item">Med Prescriptions</li>
+              </ul>
+            </aside>
+            <div class="dash-content">
+              <div class="dash-header">
+                <div>
+                  <h2 data-tr="dash_pat_title">Patient Profile: Rahul Verma</h2>
+                  <p style="font-size: 13px; color: var(--text-secondary);" data-tr="dash_pat_sub">ABHA Linked Profile: 12-8840-2384-9012</p>
+                </div>
+              </div>
+              
+              <div class="dash-stats-row">
+                <div class="dash-stat-card">
+                  <div class="label" data-tr="dash_pat_last">Last Checkup</div>
+                  <div class="value">Yesterday</div>
+                </div>
+                <div class="dash-stat-card">
+                  <div class="label" data-tr="dash_pat_next">Next Consultation</div>
+                  <div class="value">July 12</div>
+                </div>
+                <div class="dash-stat-card">
+                  <div class="label" data-tr="dash_pat_meds">Active Medications</div>
+                  <div class="value">3 Medicines</div>
+                </div>
+              </div>
+
+              <!-- Active prescriptions view -->
+              <div class="glass-card" style="padding: 24px;">
+                <h4 style="margin-bottom: 16px;" data-tr="dash_pat_current_title">Current Digital Prescriptions</h4>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                  <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+                    <div>
+                      <strong style="font-size: 14px;">Paracetamol (650mg)</strong>
+                      <p style="font-size: 12px; color: var(--text-secondary);">1 tablet - Twice daily - After meals</p>
+                    </div>
+                    <span class="badge" style="margin: 0; background: var(--success-bg); color: var(--success-color);">Active</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between;">
+                    <div>
+                      <strong style="font-size: 14px;">Amoxicillin (500mg)</strong>
+                      <p style="font-size: 12px; color: var(--text-secondary);">1 capsule - Three times daily - 5 Days course</p>
+                    </div>
+                    <span class="badge" style="margin: 0; background: var(--success-bg); color: var(--success-color);">Active</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- AI Analytics Section -->
+    <section id="analytics" class="analytics">
+      <div class="container">
+        <div class="analytics-layout">
+          <div class="reveal">
+            <span class="badge" data-tr="anal_badge">Dynamic Analytics</span>
+            <h2 data-tr="anal_title">Real-Time Operations Tracking</h2>
+            <p data-tr="anal_subheading">Generate actionable insights automatically. Evaluate diagnostic trends, peak slot hours, and doctor productivity curves in real-time.</p>
+            
+            <div style="display: flex; gap: 12px; margin-top: 32px;">
+              <button class="btn btn-primary" id="btnFilterPatients" data-tr="anal_btn_patients">Patient Volume</button>
+              <button class="btn btn-secondary" id="btnFilterRevenue" data-tr="anal_btn_revenue">Revenue Reports</button>
+            </div>
+          </div>
+          
+          <div class="analytics-charts-grid reveal">
+            <!-- Dynamic SVG bar chart box -->
+            <div class="chart-card glass-card">
+              <h4 id="chartTitle" data-tr="anal_chart_title">Average Patient Load (Weekly)</h4>
+              <div class="chart-svg-container">
+                <div class="svg-bar-chart" id="barChartContainer">
+                  <!-- Filled dynamically in app.js -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why Choose Us Section -->
+    <section class="why-choose-us">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="badge" data-tr="why_badge">Why Upchaar</span>
+          <h2 data-tr="why_title">Designed to Optimize Clinical Workflow</h2>
+          <p data-tr="why_subheading">We merge medical expertise with cloud orchestration and local frontend terminals to build a seamless clinic infrastructure.</p>
+        </div>
+        
+        <div class="why-grid">
+          <div class="why-card glass-card reveal">
+            <h4 data-tr="why_card1_title">AI Voice Transcription</h4>
+            <p data-tr="why_card1_desc">Converts natural verbal consultation into valid structured digital prescriptions inside patient portals.</p>
+          </div>
+          <div class="why-card glass-card reveal">
+            <h4 data-tr="why_card2_title">Govt. ABHA Syncing</h4>
+            <p data-tr="why_card2_desc">Fully compliant and secure fetching of national digital health logs using standardized authentication pathways.</p>
+          </div>
+          <div class="why-card glass-card reveal">
+            <h4 data-tr="why_card3_title">Zero Waiting Rooms</h4>
+            <p data-tr="why_card3_desc">Contactless QR code scans checking in patients to live updated timelines automatically.</p>
           </div>
         </div>
       </div>
@@ -212,214 +561,121 @@
     <!-- Doctors Section -->
     <section id="doctors" class="doctors">
       <div class="container">
-        <div class="section-header">
-          <h2>Our Medical Specialists</h2>
-          <p>Meet our handpicked team of certified and highly experienced healthcare professionals.</p>
+        <div class="section-header reveal">
+          <span class="badge" data-tr="doctors_badge">Specialists</span>
+          <h2 data-tr="doctors_title">Consult Our Verified Clinicians</h2>
+          <p data-tr="doctors_subheading">Connect with highly qualified medical practitioners and schedule immediate clinical reviews.</p>
         </div>
         
         <div class="doctors-grid" id="doctors-list">
-          <div class="doctor-card" data-doctor-id="dr-sharma" data-specialty="General Physician">
-            <div class="doctor-avatar-wrapper">
-              <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="doctor-svg-avatar">
-                <circle cx="100" cy="100" r="90" fill="#f4f5f7"/>
-                <path d="M60 170 C 60 130, 140 130, 140 170" fill="#1d2939"/>
-                <circle cx="100" cy="85" r="35" fill="#fcddec"/>
-                <path d="M85 120 C 85 140, 115 140, 115 120" stroke="#0e9384" stroke-width="4" fill="none"/>
-                <path d="M65 85 C 65 60, 135 60, 135 85" stroke="#101828" stroke-width="6" fill="none"/>
-              </svg>
-            </div>
-            <div class="doctor-info">
-              <span class="doc-tag">General Physician</span>
-              <h3>Dr. Aarav Sharma</h3>
-              <p class="doc-meta">MD, Internal Medicine &bull; 12 yrs exp</p>
-              <div class="doc-rating">
-                <span class="stars">★★★★★</span>
-                <span class="rating-num">4.9</span>
-                <span class="reviews-count">(340 reviews)</span>
-              </div>
-              <div class="doc-availability">
-                <span class="pulse-green"></span>
-                <span>Next slot: Tomorrow, 9:00 AM</span>
-              </div>
-              <button class="btn btn-secondary btn-book-now" data-doc-id="dr-sharma">Book Appointment</button>
-            </div>
-          </div>
-
-          <div class="doctor-card" data-doctor-id="dr-patel" data-specialty="Pediatrics">
-            <div class="doctor-avatar-wrapper">
-              <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="doctor-svg-avatar">
-                <circle cx="100" cy="100" r="90" fill="#f4f5f7"/>
-                <path d="M60 170 C 60 130, 140 130, 140 170" fill="#1e3a8a"/>
-                <circle cx="100" cy="85" r="35" fill="#fef3c7"/>
-                <path d="M78 80 C 78 50, 122 50, 122 80" stroke="#1e293b" stroke-width="8" fill="none"/>
-                <path d="M85 120 C 85 145, 115 145, 115 120" stroke="#0e9384" stroke-width="4" fill="none"/>
-              </svg>
-            </div>
-            <div class="doctor-info">
-              <span class="doc-tag">Pediatrician</span>
-              <h3>Dr. Ananya Patel</h3>
-              <p class="doc-meta">MD, Pediatrics &bull; 9 yrs exp</p>
-              <div class="doc-rating">
-                <span class="stars">★★★★★</span>
-                <span class="rating-num">4.8</span>
-                <span class="reviews-count">(215 reviews)</span>
-              </div>
-              <div class="doc-availability">
-                <span class="pulse-green"></span>
-                <span>Next slot: Tomorrow, 11:30 AM</span>
-              </div>
-              <button class="btn btn-secondary btn-book-now" data-doc-id="dr-patel">Book Appointment</button>
-            </div>
-          </div>
-
-          <div class="doctor-card" data-doctor-id="dr-mehta" data-specialty="Cardiology">
-            <div class="doctor-avatar-wrapper">
-              <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="doctor-svg-avatar">
-                <circle cx="100" cy="100" r="90" fill="#f4f5f7"/>
-                <path d="M60 170 C 60 130, 140 130, 140 170" fill="#312e81"/>
-                <circle cx="100" cy="85" r="35" fill="#ffedd5"/>
-                <path d="M80 120 C 80 140, 120 140, 120 120" stroke="#0e9384" stroke-width="4" fill="none"/>
-                <circle cx="100" cy="82" r="33" stroke="#111827" stroke-width="4" fill="none"/>
-              </svg>
-            </div>
-            <div class="doctor-info">
-              <span class="doc-tag">Cardiologist</span>
-              <h3>Dr. Vikram Mehta</h3>
-              <p class="doc-meta">DM, Cardiology &bull; 15 yrs exp</p>
-              <div class="doc-rating">
-                <span class="stars">★★★★★</span>
-                <span class="rating-num">4.95</span>
-                <span class="reviews-count">(490 reviews)</span>
-              </div>
-              <div class="doc-availability">
-                <span class="pulse-green"></span>
-                <span>Next slot: Wed, 2:00 PM</span>
-              </div>
-              <button class="btn btn-secondary btn-book-now" data-doc-id="dr-mehta">Book Appointment</button>
-            </div>
-          </div>
+          <!-- Populated dynamically via app.js -->
         </div>
       </div>
     </section>
 
-    <!-- Why Choose Us / Features -->
-    <section id="features" class="features">
-      <div class="container">
-        <div class="features-wrapper">
-          <div class="features-content">
-            <span class="badge">Modern Clinic Experience</span>
-            <h2>Why Choose Upchaar?</h2>
-            <p>We are redefining medical consultations through technology and compassionate medical treatment.</p>
-            
-            <div class="features-list">
-              <div class="feature-item">
-                <div class="feature-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"/>
-                    <polyline points="12 6 12 12 16 14"/>
-                  </svg>
-                </div>
-                <div>
-                  <h4>Zero Wait Times</h4>
-                  <p>Booked slots are respected precisely. Walk right in at your selected time.</p>
-                </div>
-              </div>
-
-              <div class="feature-item">
-                <div class="feature-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                  </svg>
-                </div>
-                <div>
-                  <h4>Certified Clinicians</h4>
-                  <p>All doctors undergo rigorous verification and background checks.</p>
-                </div>
-              </div>
-
-              <div class="feature-item">
-                <div class="feature-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                  </svg>
-                </div>
-                <div>
-                  <h4>Instant SMS/WhatsApp Confirmation</h4>
-                  <p>Receive digital confirmation and reminders directly on your phone.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="features-visual">
-            <div class="schedule-mockup">
-              <div class="mockup-header">
-                <span>Tomorrow's Slots</span>
-                <span class="dots">•••</span>
-              </div>
-              <div class="mockup-body">
-                <div class="mockup-row active">
-                  <div class="mockup-time">09:00 AM</div>
-                  <div class="mockup-details">
-                    <strong>General Checkup</strong>
-                    <span>Dr. Aarav Sharma</span>
-                  </div>
-                  <div class="mockup-status booked">Booked</div>
-                </div>
-                <div class="mockup-row">
-                  <div class="mockup-time">10:00 AM</div>
-                  <div class="mockup-details">
-                    <strong>Consultation</strong>
-                    <span>Dr. Ananya Patel</span>
-                  </div>
-                  <div class="mockup-status available">Available</div>
-                </div>
-                <div class="mockup-row">
-                  <div class="mockup-time">11:00 AM</div>
-                  <div class="mockup-details">
-                    <strong>Skin Therapy</strong>
-                    <span>Dermatology Clinic</span>
-                  </div>
-                  <div class="mockup-status available">Available</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Testimonials Section -->
+    <!-- Testimonials Carousel Section -->
     <section class="testimonials">
       <div class="container">
-        <div class="section-header">
-          <h2>Patient Reviews</h2>
-          <p>Read about patient experiences after booking through Upchaar.</p>
+        <div class="section-header reveal">
+          <span class="badge" data-tr="test_badge">Patient Stories</span>
+          <h2 data-tr="test_title">Trust by Clinicians & Patients</h2>
+        </div>
+      </div>
+      
+      <div class="carousel-wrapper reveal">
+        <div class="carousel-track" id="testimonialCarouselTrack">
+          <!-- Populated dynamically in app.js for seamless infinite scrolling loop -->
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="badge" data-tr="faq_badge">FAQ</span>
+          <h2 data-tr="faq_title">Frequently Asked Questions</h2>
         </div>
         
-        <div class="testimonials-grid">
-          <div class="testimonial-card">
-            <div class="rating">★★★★★</div>
-            <p>"The clinic has a fully white, clean aesthetic, and the appointment booking was incredibly smooth. Visited Dr. Sharma right on schedule!"</p>
-            <div class="user-info">
-              <strong>Rahul V.</strong>
-              <span>Verified Patient</span>
+        <div class="faq-list reveal">
+          <div class="faq-item glass-card">
+            <button class="faq-question-btn">
+              <span data-tr="faq_q1">What is ABHA and how does it integrate with Upchaar?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              <p data-tr="faq_a1">ABHA (Ayushman Bharat Health Account) is a national digital health identity. Upchaar syncs with your ABHA ID to retrieve health records and share prescriptions securely.</p>
             </div>
           </div>
 
-          <div class="testimonial-card">
-            <div class="rating">★★★★★</div>
-            <p>"Amazing interface. Being able to choose slots online and immediately get confirmation saved me so much wait time in the clinic lobby."</p>
-            <div class="user-info">
-              <strong>Priya M.</strong>
-              <span>Verified Patient</span>
+          <div class="faq-item glass-card">
+            <button class="faq-question-btn">
+              <span data-tr="faq_q2">How accurate is the AI Voice Prescription feature?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              <p data-tr="faq_a2">Our clinic model transcribes voice inputs with high accuracy, automatically sorting speech into symptoms, diagnoses, and medical dosages.</p>
             </div>
+          </div>
+
+          <div class="faq-item glass-card">
+            <button class="faq-question-btn">
+              <span data-tr="faq_q3">Is patient data stored securely on the cloud?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              <p data-tr="faq_a3">Yes, patient logs and medical lockers are protected using end-to-end cloud encryption, strictly meeting state data security guidelines.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact & Map Section -->
+    <section id="contact" class="contact">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="badge" data-tr="contact_badge">Contact Us</span>
+          <h2 data-tr="contact_title">Get in Touch</h2>
+        </div>
+        
+        <div class="contact-layout">
+          <div class="glass-card reveal" style="padding: 40px;">
+            <h4 style="font-family: var(--font-title); font-size: 20px; margin-bottom: 24px;" data-tr="contact_subtitle">Send us a message</h4>
+            <form id="contactForm" style="display: flex; flex-direction: column; gap: 20px;">
+              <div class="form-group">
+                <input type="text" placeholder="Name" required style="padding: 14px 20px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 100px;">
+              </div>
+              <div class="form-group">
+                <input type="email" placeholder="Email" required style="padding: 14px 20px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 100px;">
+              </div>
+              <div class="form-group">
+                <textarea rows="4" placeholder="Message" required style="padding: 14px 20px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; outline: none;"></textarea>
+              </div>
+              <button type="submit" class="btn btn-accent" data-tr="contact_btn">Send Message</button>
+            </form>
+          </div>
+          
+          <div class="contact-card-map reveal">
+            <!-- Simulated premium graphical vector map -->
+            <svg viewBox="0 0 400 400" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg" style="background: var(--bg-secondary);">
+              <rect width="100%" height="100%" fill="var(--bg-secondary)" />
+              <path d="M 0 100 H 400 M 0 200 H 400 M 0 300 H 400 M 100 0 V 400 M 200 0 V 400 M 300 0 V 400" stroke="var(--border-color)" stroke-width="1"/>
+              <!-- Marker glow -->
+              <circle cx="200" cy="200" r="30" fill="var(--accent-glow)" />
+              <circle cx="200" cy="200" r="10" fill="var(--accent-color)" />
+              <circle cx="200" cy="200" r="4" fill="white" />
+              <!-- Map text -->
+              <text x="215" y="195" fill="var(--text-primary)" font-family="Outfit" font-size="14" font-weight="700">Upchaar Clinic</text>
+              <text x="215" y="212" fill="var(--text-secondary)" font-family="Plus Jakarta Sans" font-size="10">Bandra West, Mumbai</text>
+            </svg>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- Interactive Booking Slide-Over Modal -->
+  <!-- Interactive Slide-over Booking Modal -->
   <div class="booking-modal-overlay" id="booking-modal">
     <div class="booking-modal-container">
       <button class="modal-close-btn" id="modal-close" aria-label="Close modal">
@@ -429,24 +685,18 @@
         </svg>
       </button>
       
-      <!-- Wizard Steps -->
       <div class="booking-wizard">
         <div class="wizard-steps-header">
-          <div class="step-indicator active" data-step="1">1. Date & Time</div>
+          <div class="step-indicator active" data-step="1" data-tr="wizard_step1">1. Date & Time</div>
           <div class="step-line"></div>
-          <div class="step-indicator" data-step="2">2. Your Details</div>
+          <div class="step-indicator" data-step="2" data-tr="wizard_step2">2. Details</div>
           <div class="step-line"></div>
-          <div class="step-indicator" data-step="3">3. Confirmed</div>
+          <div class="step-indicator" data-step="3" data-tr="wizard_step3">3. Confirmed</div>
         </div>
 
-        <!-- Selected Doctor Header -->
         <div class="selected-doctor-profile" id="modal-doctor-profile">
           <div class="modal-doctor-avatar">
-            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="100" cy="100" r="90" fill="#f4f5f7"/>
-              <path d="M60 170 C 60 130, 140 130, 140 170" fill="#1d2939"/>
-              <circle cx="100" cy="85" r="35" fill="#fcddec"/>
-            </svg>
+            <!-- Injected by JS -->
           </div>
           <div>
             <h4 id="modal-doctor-name">Dr. Aarav Sharma</h4>
@@ -454,147 +704,198 @@
           </div>
         </div>
 
-        <!-- Step 1: Schedule Selection -->
+        <!-- Step 1 Pane -->
         <div class="wizard-step-pane active" id="pane-step-1">
-          <h3>Select Preferred Appointment Date</h3>
-          <div class="date-selector-grid" id="calendar-grid">
-            <!-- Loaded dynamically in app.js -->
-          </div>
+          <h3 data-tr="wizard_choose_date">Select Appointment Date</h3>
+          <div class="date-selector-grid" id="calendar-grid"></div>
 
-          <h3 class="margin-top-md">Choose Available Time Slot</h3>
-          <div class="time-slots-group" id="time-slots-container">
-            <!-- Loaded dynamically in app.js -->
-          </div>
+          <h3 class="margin-top-md" data-tr="wizard_choose_time">Choose Time Slot</h3>
+          <div class="time-slots-group" id="time-slots-container"></div>
 
           <div class="wizard-footer">
-            <button class="btn btn-primary width-full" id="btn-next-step" disabled>Continue to Patient Details</button>
+            <button class="btn btn-primary width-full" id="btn-next-step" disabled data-tr="wizard_btn_continue">Continue</button>
           </div>
         </div>
 
-        <!-- Step 2: Patient Form -->
+        <!-- Step 2 Pane -->
         <div class="wizard-step-pane" id="pane-step-2">
-          <h3>Patient Information</h3>
+          <h3 data-tr="wizard_patient_info">Patient Information</h3>
           <form id="booking-details-form" class="booking-form">
             <div class="form-group">
-              <label for="patient-name">Full Name</label>
-              <input type="text" id="patient-name" required placeholder="e.g. John Doe">
+              <label for="patient-name" data-tr="wizard_label_name">Full Name</label>
+              <input type="text" id="patient-name" required placeholder="John Doe">
             </div>
             
             <div class="form-group-row">
               <div class="form-group">
-                <label for="patient-phone">Phone Number</label>
-                <input type="tel" id="patient-phone" required placeholder="e.g. +91 98765 43210">
+                <label for="patient-phone" data-tr="wizard_label_phone">Phone Number</label>
+                <input type="tel" id="patient-phone" required placeholder="+91 98765-43210">
               </div>
               <div class="form-group">
-                <label for="patient-email">Email Address</label>
-                <input type="email" id="patient-email" required placeholder="e.g. name@domain.com">
+                <label for="patient-email" data-tr="wizard_label_email">Email</label>
+                <input type="email" id="patient-email" required placeholder="john@domain.com">
               </div>
             </div>
 
             <div class="form-group">
-              <label for="patient-reason">Reason for Visit (Optional)</label>
-              <textarea id="patient-reason" rows="3" placeholder="Describe symptoms or purpose of checkup..."></textarea>
+              <label for="patient-reason" data-tr="wizard_label_reason">Reason for Visit (Optional)</label>
+              <textarea id="patient-reason" rows="3" placeholder="Describe symptoms..."></textarea>
             </div>
 
             <div class="wizard-footer form-actions">
-              <button type="button" class="btn btn-secondary" id="btn-prev-step">Back</button>
-              <button type="submit" class="btn btn-primary" id="btn-submit-booking">Confirm Booking</button>
+              <button type="button" class="btn btn-secondary" id="btn-prev-step" data-tr="wizard_btn_back">Back</button>
+              <button type="submit" class="btn btn-primary" id="btn-submit-booking" data-tr="wizard_btn_confirm">Confirm Booking</button>
             </div>
           </form>
         </div>
 
-        <!-- Step 3: Confirmation -->
+        <!-- Step 3 Pane (Success) -->
         <div class="wizard-step-pane" id="pane-step-3">
           <div class="success-screen">
             <div class="success-icon-wrapper">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#039855" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3">
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
             </div>
-            <h2>Appointment Confirmed!</h2>
-            <p>Your booking request is successfully submitted. A confirmation SMS/WhatsApp and email details are sent.</p>
+            <h2 data-tr="wizard_success_title">Appointment Confirmed!</h2>
+            <p data-tr="wizard_success_desc">Your appointment is scheduled. We have sent a confirmation message to your registered phone.</p>
             
             <div class="booking-receipt-card">
               <div class="receipt-row">
-                <span class="label">Reference ID</span>
-                <span class="value" id="receipt-ref-id">UPC-884013</span>
+                <span class="label" data-tr="receipt_ref">Reference ID</span>
+                <span class="value" id="receipt-ref-id">UPC-88402</span>
               </div>
               <div class="receipt-row">
-                <span class="label">Doctor</span>
+                <span class="label" data-tr="receipt_doctor">Doctor</span>
                 <span class="value" id="receipt-doctor-name">Dr. Aarav Sharma</span>
               </div>
               <div class="receipt-row">
-                <span class="label">Date & Time</span>
+                <span class="label" data-tr="receipt_datetime">Date & Time</span>
                 <span class="value" id="receipt-date-time">July 6, 2026 at 10:00 AM</span>
               </div>
               <div class="receipt-row">
-                <span class="label">Patient</span>
+                <span class="label" data-tr="receipt_patient">Patient</span>
                 <span class="value" id="receipt-patient-name">John Doe</span>
               </div>
             </div>
 
             <div class="wizard-footer flex-column">
-              <button class="btn btn-primary width-full" id="btn-booking-done">Done</button>
-              <button class="btn btn-text" id="btn-print-receipt">Print Receipt</button>
+              <button class="btn btn-primary width-full" id="btn-booking-done" data-tr="wizard_btn_done">Done</button>
+              <button class="btn btn-text" id="btn-print-receipt" data-tr="wizard_btn_print">Print Receipt</button>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </div>
 
+  <!-- Watch Demo Video Modal -->
+  <div class="booking-modal-overlay" id="demo-modal">
+    <div class="booking-modal-container" style="max-width: 600px; justify-content: center; height: auto;">
+      <button class="modal-close-btn" id="demo-modal-close" aria-label="Close modal">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <div style="text-align: center; padding: 20px;">
+        <h3 style="font-family: var(--font-title); font-size: 22px; margin-bottom: 16px;" data-tr="demo_title">Upchaar Platform Walkthrough</h3>
+        <div style="background-color: #000; border-radius: 12px; overflow: hidden; position: relative; padding-top: 56.25%;">
+          <!-- Simulated Premium Video Mockup -->
+          <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;">
+            <svg width="64" height="64" fill="var(--accent-color)" viewBox="0 0 24 24" style="cursor: pointer; filter: drop-shadow(0 4px 12px rgba(0,179,164,0.4));"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <p style="margin-top: 16px; font-size: 13px; opacity: 0.8;" data-tr="demo_playback">Play Demo Video (2:30 min)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Persistent AI Assistant Chatbot (WOW FEATURE) -->
+  <div class="floating-ai-trigger" id="aiTrigger" aria-label="Open AI Assistant">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+  </div>
+
+  <div class="ai-chat-window glass-card" id="aiChatWindow">
+    <div class="chat-header">
+      <h4 data-tr="chat_header">
+        <span style="display: inline-block; width: 8px; height: 8px; background-color: var(--accent-color); border-radius: 50%;"></span>
+        Upchaar AI Assistant
+      </h4>
+      <span class="chat-close-btn" id="aiChatClose">&times;</span>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-bubble bot" data-tr="chat_greeting">
+        Hello! I am Upchaar AI. I can help you schedule appointments, query ABHA details, or explain clinic guidelines. What can I do for you today?
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" id="chatInput" placeholder="Ask AI Assistant...">
+      <button class="chat-send-btn" id="chatSendBtn" aria-label="Send message">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+
   <!-- Footer -->
-  <footer class="footer" id="about">
-    <div class="container footer-container">
-      <div class="footer-brand">
+  <footer class="footer">
+    <div class="container footer-layout">
+      <div class="footer-col">
         <div class="logo">
-          <span class="logo-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M19 10.5C19 15.19 12 21 12 21C12 21 5 15.19 5 10.5C5 6.35786 8.13401 3 12 3C15.866 3 19 6.35786 19 10.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M12 7V14M9.5 10.5H14.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+          <span class="logo-symbol">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
           </span>
           <span class="logo-text">Upchaar</span>
         </div>
-        <p>Premium, high-end healthcare for local families, combining expert specialists with state-of-the-art medical consulting services.</p>
-        <span class="copyright">&copy; 2026 Upchaar Clinic. All rights reserved.</span>
+        <p data-tr="footer_brand_desc">Premium, next-generation AI-powered medical platform designed for modern clinics and secure patient health data orchestration.</p>
+        <div class="newsletter-form">
+          <input type="email" placeholder="Enter your email" aria-label="Newsletter email">
+          <button class="btn btn-primary" style="padding: 10px 20px; font-size: 12px;" data-tr="footer_newsletter_btn">Subscribe</button>
+        </div>
       </div>
       
-      <div class="footer-links-group">
+      <div class="footer-grid-links">
         <div>
-          <h4>Services</h4>
+          <h5 data-tr="footer_col_platform">Platform</h5>
           <ul>
-            <li><a href="#services">General Medicine</a></li>
-            <li><a href="#services">Pediatrics</a></li>
-            <li><a href="#services">Cardiology</a></li>
-            <li><a href="#services">Dermatology</a></li>
-            <li><a href="#services">Orthopedics</a></li>
+            <li><a href="#features" data-tr="footer_link_features">Features</a></li>
+            <li><a href="#dashboards" data-tr="footer_link_dashboards">Dashboards</a></li>
+            <li><a href="#analytics" data-tr="footer_link_analytics">AI Analytics</a></li>
           </ul>
         </div>
-        
         <div>
-          <h4>Clinic Hours</h4>
-          <ul class="hours-list">
-            <li><span>Mon - Fri:</span> <span>8:00 AM - 8:00 PM</span></li>
-            <li><span>Saturday:</span> <span>9:00 AM - 5:00 PM</span></li>
-            <li><span>Sunday:</span> <span>Closed (Emergency Only)</span></li>
+          <h5 data-tr="footer_col_resources">Resources</h5>
+          <ul>
+            <li><a href="#" data-tr="footer_link_abha">ABHA Sync</a></li>
+            <li><a href="#" data-tr="footer_link_security">Security Logs</a></li>
           </ul>
         </div>
-
         <div>
-          <h4>Contact Us</h4>
-          <ul class="contact-info-list">
-            <li><strong>Phone:</strong> +91 22 2345 6789</li>
-            <li><strong>Email:</strong> care@upchaar.com</li>
-            <li><strong>Address:</strong> 101, Medical Heights, Bandra West, Mumbai, MH - 400050</li>
+          <h5 data-tr="footer_col_company">Company</h5>
+          <ul>
+            <li><a href="#" data-tr="footer_link_about">About Us</a></li>
+            <li><a href="#" data-tr="footer_link_careers">Careers</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5 data-tr="footer_col_legal">Legal</h5>
+          <ul>
+            <li><a href="#" data-tr="footer_link_privacy">Privacy Policy</a></li>
+            <li><a href="#" data-tr="footer_link_terms">Terms of Use</a></li>
           </ul>
         </div>
       </div>
     </div>
+    
+    <div class="container footer-bottom">
+      <span>&copy; 2026 Upchaar Clinic Systems. All rights reserved.</span>
+      <span data-tr="footer_tag">Smart Health Orchestration</span>
+    </div>
   </footer>
 
-  <!-- App Javascript -->
+  <!-- App Script -->
   <script src="app.js"></script>
 </body>
 </html>
