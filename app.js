@@ -414,6 +414,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initFeatureSandboxes();
   initModalListeners();
   initScrollAnimations();
+  initExtraFeatures();
 });
 
 // ==========================================================================
@@ -968,4 +969,147 @@ function initScrollAnimations() {
 
   window.addEventListener('scroll', checkReveal);
   checkReveal(); // Trigger once on load
+}
+
+// ==========================================================================
+// EXTRA FUNCTIONALITIES (MOBILE NAV, LOCKER, TESTIMONIALS, CHECK-IN, ETC)
+// ==========================================================================
+const TESTIMONIALS = [
+  { text: "The clinic has a fully white, clean aesthetic, and the appointment booking was incredibly smooth. Visited Dr. Sharma right on schedule!", user: "Rahul Verma", role: "Patient" },
+  { text: "Amazing interface. Being able to choose slots online and immediately get confirmation saved me so much wait time in the clinic lobby.", user: "Priya Sen", role: "Patient" },
+  { text: "As a clinician, Upchaar's AI voice prescription saves me hours of manual note-taking every single day. Recommended for all hospitals.", user: "Dr. Vikram Mehta", role: "Cardiologist" },
+  { text: "Managing reception check-ins and walk-ins used to be chaotic. The smart queue and contactless QR check-in solved it for our staff.", user: "Neha Joshi", role: "Clinic Owner" }
+];
+
+function initExtraFeatures() {
+  // Mobile Nav Toggle
+  const mobileNavToggle = document.getElementById('mobileNavToggle');
+  const navLinks = document.querySelector('.nav-links');
+  if (mobileNavToggle && navLinks) {
+    mobileNavToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('open');
+    });
+  }
+
+  // Populate Testimonials Carousel
+  const carouselTrack = document.getElementById('testimonialCarouselTrack');
+  if (carouselTrack) {
+    carouselTrack.innerHTML = '';
+    // Duplicate testimonials list twice to create infinite loop scroll
+    const items = [...TESTIMONIALS, ...TESTIMONIALS, ...TESTIMONIALS];
+    items.forEach(t => {
+      const card = document.createElement('div');
+      card.className = 'testimonial-box glass-card';
+      card.innerHTML = `
+        <div class="rating">★★★★★</div>
+        <p>"${t.text}"</p>
+        <div class="testimonial-user">
+          <div class="testimonial-avatar" style="background: var(--accent-light); display:flex; align-items:center; justify-content:center; color: var(--accent-color); font-weight:700; font-size:12px;">
+            ${t.user.charAt(0)}
+          </div>
+          <div class="user-details">
+            <h5>${t.user}</h5>
+            <span>${t.role}</span>
+          </div>
+        </div>
+      `;
+      carouselTrack.appendChild(card);
+    });
+  }
+
+  // Patient Profile Selector
+  const patientSelect = document.getElementById('patientProfileSelector');
+  const patientOutput = document.getElementById('patientProfileOutput');
+  if (patientSelect && patientOutput) {
+    patientSelect.addEventListener('change', () => {
+      const val = patientSelect.value;
+      if (val === 'rahul') {
+        patientOutput.innerHTML = 'Age: 28 | BP: 120/80 | History: Asthma | Last visit: Yesterday';
+      } else if (val === 'priya') {
+        patientOutput.innerHTML = 'Age: 24 | BP: 110/70 | History: Allergy to dust | Last visit: 2 weeks ago';
+      }
+    });
+  }
+
+  // Digital Locker Upload Simulator
+  const lockerDrop = document.getElementById('lockerDropzone');
+  const lockerList = document.getElementById('lockerFileList');
+  if (lockerDrop && lockerList) {
+    lockerDrop.addEventListener('click', () => {
+      const mockFiles = [
+        "MRI_BrainScan_July.pdf",
+        "Chest_XRay_Report.pdf",
+        "CompleteBloodCount_June.pdf"
+      ];
+      const selectedFile = mockFiles[Math.floor(Math.random() * mockFiles.length)];
+      
+      const fileRow = document.createElement('div');
+      fileRow.style.display = 'flex';
+      fileRow.style.justifyContent = 'space-between';
+      fileRow.style.background = 'var(--bg-secondary)';
+      fileRow.style.padding = '6px 12px';
+      fileRow.style.borderRadius = '4px';
+      fileRow.style.marginTop = '4px';
+      fileRow.innerHTML = `
+        <span>${selectedFile}</span>
+        <span style="color: var(--success-color); font-weight:600;">✓ Uploaded</span>
+      `;
+      lockerList.appendChild(fileRow);
+    });
+  }
+
+  // Contact Form Submission Handler
+  const contactForm = document.getElementById('contactForm');
+  if (contactForm) {
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('Thank you! Your message has been received. Our support team will contact you shortly.');
+      contactForm.reset();
+    });
+  }
+
+  // Live Queue Tracker ticking simulator
+  const activeToken = document.getElementById('queueActiveToken');
+  const estWait = document.getElementById('queueEstWait');
+  if (activeToken && estWait) {
+    let currentWait = 12;
+    setInterval(() => {
+      currentWait -= 1;
+      if (currentWait < 2) {
+        currentWait = 15;
+        // Swap token
+        activeToken.textContent = activeToken.textContent === '#A-14' ? '#A-15' : '#A-14';
+      }
+      estWait.textContent = `${currentWait} mins`;
+    }, 15000); // Check every 15 seconds
+  }
+
+  // Scan check-in simulation trigger
+  const qrBtn = document.getElementById('generateQrBtn');
+  const qrBox = document.getElementById('qrCodeContainer');
+  if (qrBtn && qrBox) {
+    qrBtn.addEventListener('click', () => {
+      // Check if scanner button already exists to avoid duplicates
+      if (qrBox.querySelector('.sim-scan-btn')) return;
+      
+      const scanBtn = document.createElement('button');
+      scanBtn.className = 'btn btn-secondary sim-scan-btn';
+      scanBtn.style.width = '100%';
+      scanBtn.style.marginTop = '10px';
+      scanBtn.style.fontSize = '11px';
+      scanBtn.textContent = 'Simulate Front Desk Scanner';
+      scanBtn.addEventListener('click', () => {
+        alert('Check-in Successful! Token #A-18 generated. Welcome, Rahul Verma.');
+        scanBtn.remove();
+        qrBox.style.display = 'none';
+        qrBtn.style.display = 'block';
+
+        const checkedInVal = document.querySelector('#screen-reception .dash-stat-card .value');
+        if (checkedInVal) {
+          checkedInVal.textContent = parseInt(checkedInVal.textContent) + 1;
+        }
+      });
+      qrBox.appendChild(scanBtn);
+    });
+  }
 }
