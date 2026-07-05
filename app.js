@@ -401,12 +401,38 @@ const MOCK_PATIENTS = {
 };
 
 // ==========================================================================
+// BACKEND API SYNC CONFIG
+// ==========================================================================
+const API_BASE_URL = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
+  ? 'http://localhost:5001'
+  : 'https://upcharr.onrender.com';
+
+async function loadAppointmentsFromBackend() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/appointments`);
+    if (res.ok) {
+      const data = await res.json();
+      MOCK_PATIENTS.doctor = data.map(app => ({
+        name: app.patient_name,
+        time: app.date_time,
+        token: app.reference_id,
+        status: app.status
+      }));
+      renderDashboardState();
+    }
+  } catch (err) {
+    console.warn("Could not load appointments from backend, using fallback client state:", err);
+  }
+}
+
+// ==========================================================================
 // INITIALIZATION
 // ==========================================================================
 function init() {
   initTheme();
   initLanguage();
   initDashboards();
+  loadAppointmentsFromBackend();
   initAnalyticsCharts();
   renderDoctorsList();
   initAccordions();
@@ -706,7 +732,7 @@ function initFloatingAI() {
   const sendBtn = document.getElementById('chatSendBtn');
   const messagesBox = document.getElementById('chatMessages');
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     const val = input.value.trim();
     if (!val) return;
 
@@ -720,15 +746,30 @@ function initFloatingAI() {
     // Auto scroll
     messagesBox.scrollTop = messagesBox.scrollHeight;
 
-    // Simulate smart replies
-    setTimeout(() => {
-      const botMsg = document.createElement('div');
-      botMsg.className = 'chat-bubble bot';
-      
+    // Render bot typing/loading message
+    const botMsg = document.createElement('div');
+    botMsg.className = 'chat-bubble bot';
+    botMsg.textContent = 'AI is thinking...';
+    messagesBox.appendChild(botMsg);
+    messagesBox.scrollTop = messagesBox.scrollHeight;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: val })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        botMsg.textContent = data.response;
+      } else {
+        throw new Error('API error');
+      }
+    } catch (err) {
+      // Local fallback simulator replies
       const query = val.toLowerCase();
       if (query.includes('book') || query.includes('appoint')) {
         botMsg.innerHTML = 'I can help you book! Click <strong class="btn-book-trigger" style="color: var(--accent-color); cursor: pointer;">here</strong> to open our scheduling panel.';
-        // Re-bind click event to text
         setTimeout(() => {
           botMsg.querySelector('.btn-book-trigger').addEventListener('click', () => {
             win.classList.remove('open');
@@ -740,10 +781,9 @@ function initFloatingAI() {
       } else {
         botMsg.textContent = 'Our clinic offers smart queue management and voice prescriptions. You can schedule appointments directly here.';
       }
+    }
 
-      messagesBox.appendChild(botMsg);
-      messagesBox.scrollTop = messagesBox.scrollHeight;
-    }, 1500);
+    messagesBox.scrollTop = messagesBox.scrollHeight;
   };
 
   sendBtn.addEventListener('click', sendMessage);
@@ -929,32 +969,53 @@ function renderTimeSlots() {
   });
 }
 
-function submitAppointmentForm() {
+async function submitAppointmentForm() {
   const nameVal = document.getElementById('patient-name').value;
-  const refId = `UPC-${Math.floor(10000 + Math.random() * 90000)}`;
+  const emailVal = document.getElementById('patient-email')?.value || '';
+  const phoneVal = document.getElementById('patient-phone')?.value || '';
+  const docId = selectedDoctor.id;
+  const docName = selectedDoctor.name;
+  const dateTimeStr = `${selectedDate} at ${selectedTime}`;
+
+  let refId = `UPC-${Math.floor(10000 + Math.random() * 90000)}`;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/appointments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        doctorId: docId,
+        doctorName: docName,
+        patientName: nameVal,
+        patientEmail: emailVal,
+        patientPhone: phoneVal,
+        dateTime: dateTimeStr
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      refId = data.referenceId;
+    }
+  } catch (err) {
+    console.warn("Could not save appointment to backend, saving locally:", err);
+    // Local fallback
+    MOCK_PATIENTS.doctor.push({
+      name: nameVal,
+      time: selectedTime,
+      token: refId,
+      status: "Waiting"
+    });
+  }
 
   // Populate Receipt UI
   document.getElementById('receipt-ref-id').textContent = refId;
-  document.getElementById('receipt-doctor-name').textContent = selectedDoctor.name;
-  document.getElementById('receipt-date-time').textContent = `${selectedDate} at ${selectedTime}`;
+  document.getElementById('receipt-doctor-name').textContent = docName;
+  document.getElementById('receipt-date-time').textContent = dateTimeStr;
   document.getElementById('receipt-patient-name').textContent = nameVal;
 
-  // Add dynamically to doctor dashboard queue
-  MOCK_PATIENTS.doctor.push({
-    name: nameVal,
-    time: selectedTime,
-    token: `#A-${MOCK_PATIENTS.doctor.length + 14}`,
-    status: "Waiting"
-  });
-
-  // Update Stats count value in Doctor Dashboard
-  const statsPatients = document.getElementById('stats-doc-patients');
-  if (statsPatients) {
-    statsPatients.textContent = MOCK_PATIENTS.doctor.length + 15;
-  }
-
-  // Refresh dashboards queue rendering state
-  renderDashboardState();
+  // Refresh queue details from server
+  await loadAppointmentsFromBackend();
 
   goToWizardStep(3);
 }
@@ -1095,16 +1156,27 @@ function initExtraFeatures() {
   const activeToken = document.getElementById('queueActiveToken');
   const estWait = document.getElementById('queueEstWait');
   if (activeToken && estWait) {
-    let currentWait = 12;
-    setInterval(() => {
-      currentWait -= 1;
-      if (currentWait < 2) {
-        currentWait = 15;
-        // Swap token
-        activeToken.textContent = activeToken.textContent === '#A-14' ? '#A-15' : '#A-14';
+    const updateQueueUI = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/queue`);
+        if (res.ok) {
+          const data = await res.json();
+          activeToken.textContent = data.active_token;
+          estWait.textContent = `${data.estimated_wait_mins} mins`;
+        }
+      } catch (err) {
+        // Fallback offline queue simulator
+        let currentWait = parseInt(estWait.textContent) || 12;
+        currentWait -= 1;
+        if (currentWait < 2) {
+          currentWait = 15;
+          activeToken.textContent = activeToken.textContent === '#A-14' ? '#A-15' : '#A-14';
+        }
+        estWait.textContent = `${currentWait} mins`;
       }
-      estWait.textContent = `${currentWait} mins`;
-    }, 15000); // Check every 15 seconds
+    };
+    updateQueueUI();
+    setInterval(updateQueueUI, 15000); // Check every 15 seconds
   }
 
   // Scan check-in simulation trigger
@@ -1121,8 +1193,29 @@ function initExtraFeatures() {
       scanBtn.style.marginTop = '10px';
       scanBtn.style.fontSize = '11px';
       scanBtn.textContent = 'Simulate Front Desk Scanner';
-      scanBtn.addEventListener('click', () => {
-        alert('Check-in Successful! Token #A-18 generated. Welcome, Rahul Verma.');
+      scanBtn.addEventListener('click', async () => {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/checkin`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              patientName: 'Rahul Verma',
+              doctorId: 'dr-sharma',
+              doctorName: 'Dr. Aarav Sharma'
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            alert(`Check-in Successful! Token ${data.nextToken} generated. Welcome, Rahul Verma.`);
+            if (activeToken) activeToken.textContent = data.nextToken;
+            if (estWait) estWait.textContent = `${data.nextWait} mins`;
+          } else {
+            throw new Error('API error');
+          }
+        } catch (err) {
+          alert('Check-in Successful! Token #A-18 generated. Welcome, Rahul Verma.');
+        }
+
         scanBtn.remove();
         qrBox.style.display = 'none';
         qrBtn.style.display = 'block';
@@ -1131,6 +1224,9 @@ function initExtraFeatures() {
         if (checkedInVal) {
           checkedInVal.textContent = parseInt(checkedInVal.textContent) + 1;
         }
+
+        // Refresh database state
+        await loadAppointmentsFromBackend();
       });
       qrBox.appendChild(scanBtn);
     });

@@ -1,0 +1,4 @@
+node_modules/
+upchaar.db
+.env
+.DS_Store
