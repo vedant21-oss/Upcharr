@@ -403,7 +403,7 @@ const MOCK_PATIENTS = {
 // ==========================================================================
 // INITIALIZATION
 // ==========================================================================
-document.addEventListener('DOMContentLoaded', () => {
+function init() {
   initTheme();
   initLanguage();
   initDashboards();
@@ -415,7 +415,13 @@ document.addEventListener('DOMContentLoaded', () => {
   initModalListeners();
   initScrollAnimations();
   initExtraFeatures();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 
 // ==========================================================================
 // THEME & LANGUAGE CONTROLLERS
@@ -932,6 +938,23 @@ function submitAppointmentForm() {
   document.getElementById('receipt-doctor-name').textContent = selectedDoctor.name;
   document.getElementById('receipt-date-time').textContent = `${selectedDate} at ${selectedTime}`;
   document.getElementById('receipt-patient-name').textContent = nameVal;
+
+  // Add dynamically to doctor dashboard queue
+  MOCK_PATIENTS.doctor.push({
+    name: nameVal,
+    time: selectedTime,
+    token: `#A-${MOCK_PATIENTS.doctor.length + 14}`,
+    status: "Waiting"
+  });
+
+  // Update Stats count value in Doctor Dashboard
+  const statsPatients = document.getElementById('stats-doc-patients');
+  if (statsPatients) {
+    statsPatients.textContent = MOCK_PATIENTS.doctor.length + 15;
+  }
+
+  // Refresh dashboards queue rendering state
+  renderDashboardState();
 
   goToWizardStep(3);
 }

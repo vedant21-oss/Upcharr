@@ -953,6 +953,146 @@ button, input, select, textarea {
 }
 
 /* ==========================================================================
+   DOCTORS GRID
+   ========================================================================== */
+.doctors {
+  background-color: var(--bg-primary);
+}
+
+.doctors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 32px;
+  margin-top: 48px;
+}
+
+.doctor-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.doctor-card:hover {
+  border-color: var(--border-color-hover);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+}
+
+.doctor-avatar-wrapper {
+  background-color: var(--bg-secondary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.doctor-avatar-wrapper svg {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  transition: var(--transition);
+}
+
+.doctor-card:hover .doctor-avatar-wrapper svg {
+  transform: scale(1.03);
+}
+
+.doctor-info {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.doc-tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-color);
+  background-color: var(--accent-light);
+  padding: 4px 8px;
+  border-radius: 4px;
+  align-self: flex-start;
+  margin-bottom: 12px;
+}
+
+.doctor-info h3 {
+  font-family: var(--font-title);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.doc-meta {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.doc-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.stars {
+  color: #fdb022;
+}
+
+.rating-num {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.reviews-count {
+  color: var(--text-tertiary);
+}
+
+.doc-availability {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  background-color: var(--bg-secondary);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 24px;
+  border: 1px solid var(--border-color);
+}
+
+.pulse-green {
+  width: 8px;
+  height: 8px;
+  background-color: var(--success-color);
+  border-radius: 50%;
+  animation: pulse-ring 2s infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+.doctor-info button {
+  width: 100%;
+}
+
+/* ==========================================================================
    TESTIMONIALS CAROUSEL
    ========================================================================== */
 .carousel-wrapper {
