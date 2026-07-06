@@ -1,11 +1,13 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
+const ROOT = path.resolve(__dirname);
 
 // ── Supabase ──────────────────────────────────────────────
 const supabase = createClient(
@@ -16,7 +18,7 @@ const supabase = createClient(
 // ── Middleware ────────────────────────────────────────────
 app.use(cors({ origin: '*', methods: ['GET','POST','PUT','DELETE','OPTIONS'] }));
 app.use(express.json({ limit: '10mb' }));
-app.use(express.static(__dirname));
+app.use(express.static(ROOT));
 
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 300 });
 app.use('/api/', limiter);
@@ -446,7 +448,7 @@ app.get('/api/notifications', async (req, res) => {
 // Serve static frontend (original index.html)
 // ══════════════════════════════════════════════════════════
 app.get('*', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(path.join(ROOT, 'index.html'));
 });
 
 // ══════════════════════════════════════════════════════════
