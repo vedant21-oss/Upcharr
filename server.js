@@ -10,9 +10,17 @@ const PORT = process.env.PORT || 5001;
 const ROOT = path.resolve(__dirname);
 
 // ── Supabase ──────────────────────────────────────────────
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  console.warn('⚠️  WARNING: Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY environment variables!');
+  console.warn('   Add them in Vercel Dashboard → Settings → Environment Variables');
+}
+
 const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
+  SUPABASE_URL || 'https://placeholder.supabase.co',
+  SUPABASE_KEY || 'placeholder-key'
 );
 
 // ── Middleware ────────────────────────────────────────────
@@ -20,8 +28,9 @@ app.use(cors({ origin: '*', methods: ['GET','POST','PUT','DELETE','OPTIONS'] }))
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(ROOT));
 
-const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 300 });
+const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 500, standardHeaders: true, legacyHeaders: false });
 app.use('/api/', limiter);
+
 
 // ── Health Check ──────────────────────────────────────────
 app.get('/health', (req, res) => {
