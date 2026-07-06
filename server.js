@@ -27,6 +27,92 @@ app.get('/health', (req, res) => {
 });
 
 // ══════════════════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════════════════
+
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { name, email, password, role } = req.body;
+    if (!name || !email || !password) return res.status(400).json({ error: 'Name, email and password are required' });
+
+    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      email, password, email_confirm: true,
+      user_metadata: { name, role: role || 'patient' }
+    });
+    if (authError) throw new Error(authError.message);
+
+    // Also insert into patients or staff table
+    const userId = authData.user.id;
+    if (role === 'patient' || !role) {
+      await supabase.from('patients').insert({ user_id: userId, name, email }).catch(() => {});
+    } else if (role === 'doctor') {
+      await supabase.from('doctors').insert({ user_id: userId, name, email }).catch(() => {});
+    } else {
+      await supabase.from('staff').insert({ user_id: userId, name, email, role }).catch(() => {});
+    }
+
+    res.status(201).json({ success: true, message: 'Account created. You can now sign in.' });
+  } catch (err) { res.status(400).json({ error: err.message }); }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw new Error(error.message);
+
+    const user = data.user;
+    const role = user.user_metadata?.role || 'patient';
+    const name = user.user_metadata?.name || email.split('@')[0];
+
+    res.json({
+      success: true,
+      token: data.session.access_token,
+      user: { id: user.id, email: user.email, name, role }
+    });
+  } catch (err) { res.status(401).json({ error: err.message }); }
+});
+
+app.post('/api/auth/logout', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    if (token) await supabase.auth.admin.signOut(token).catch(() => {});
+    res.json({ success: true, message: 'Logged out' });
+  } catch (err) { res.json({ success: true }); }
+});
+
+app.get('/api/auth/me', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    if (!token) return res.status(401).json({ error: 'No token' });
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    if (error || !user) return res.status(401).json({ error: 'Invalid token' });
+    res.json({ success: true, user: { id: user.id, email: user.email, name: user.user_metadata?.name, role: user.user_metadata?.role || 'patient' } });
+  } catch (err) { res.status(401).json({ error: err.message }); }
+});
+
+// ── Seed demo accounts ─────────────────────────────────────
+app.post('/api/auth/seed-demo', async (req, res) => {
+  const demoAccounts = [
+    { email: 'admin@upchaar.in',     name: 'Admin User',     role: 'admin' },
+    { email: 'doctor@upchaar.in',    name: 'Dr. Aarav Demo', role: 'doctor' },
+    { email: 'reception@upchaar.in', name: 'Priya Reception', role: 'receptionist' },
+    { email: 'patient@upchaar.in',   name: 'Rahul Patient',  role: 'patient' },
+  ];
+  const results = [];
+  for (const acc of demoAccounts) {
+    const { data, error } = await supabase.auth.admin.createUser({
+      email: acc.email, password: 'Upchaar@123', email_confirm: true,
+      user_metadata: { name: acc.name, role: acc.role }
+    });
+    results.push({ email: acc.email, status: error ? error.message : 'created' });
+  }
+  res.json({ success: true, results });
+});
+
+// ══════════════════════════════════════════════════════════
 // PATIENTS
 // ══════════════════════════════════════════════════════════
 

@@ -401,6 +401,49 @@ const MOCK_PATIENTS = {
 };
 
 // ==========================================================================
+// AUTH SESSION GUARD
+// ==========================================================================
+(function checkAuth() {
+  const token = localStorage.getItem('upchaar_token');
+  const publicPages = ['login.html', 'login'];
+  const isOnPublicPage = publicPages.some(p => window.location.pathname.includes(p));
+  if (!token && !isOnPublicPage) {
+    window.location.href = 'login.html';
+  }
+})();
+
+function getAuthHeaders() {
+  const token = localStorage.getItem('upchaar_token');
+  return token ? { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } : { 'Content-Type': 'application/json' };
+}
+
+function getCurrentUser() {
+  try { return JSON.parse(localStorage.getItem('upchaar_user') || '{}'); } catch { return {}; }
+}
+
+function logout() {
+  localStorage.removeItem('upchaar_token');
+  localStorage.removeItem('upchaar_user');
+  localStorage.removeItem('upchaar_role');
+  window.location.href = 'login.html';
+}
+
+// Show logged-in user in nav
+document.addEventListener('DOMContentLoaded', () => {
+  const user = getCurrentUser();
+  if (user && user.name) {
+    // Inject user badge into nav if it exists
+    const nav = document.querySelector('nav') || document.querySelector('.nav-links') || document.querySelector('header');
+    if (nav) {
+      const badge = document.createElement('div');
+      badge.style.cssText = 'display:inline-flex;align-items:center;gap:8px;background:rgba(0,179,164,0.1);border:1px solid rgba(0,179,164,0.2);border-radius:99px;padding:6px 14px;font-size:13px;font-weight:600;color:#00b3a4;cursor:pointer;margin-left:8px;';
+      badge.innerHTML = `<span style="width:8px;height:8px;background:#00b3a4;border-radius:50%;display:inline-block;"></span>${user.name.split(' ')[0]} (${user.role || 'user'}) &nbsp;·&nbsp; <span onclick="logout()" style="color:#ef4444;cursor:pointer;">Logout</span>`;
+      nav.appendChild(badge);
+    }
+  }
+});
+
+// ==========================================================================
 // BACKEND API SYNC CONFIG
 // ==========================================================================
 const API_BASE_URL = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
