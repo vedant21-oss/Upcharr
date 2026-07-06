@@ -799,12 +799,12 @@ function initFloatingAI() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: val })
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ message: val, language: currentLang })
       });
       if (res.ok) {
         const data = await res.json();
-        botMsg.textContent = data.response;
+        botMsg.textContent = data.reply || data.response;
       } else {
         throw new Error('API error');
       }
@@ -1025,24 +1025,26 @@ async function submitAppointmentForm() {
   try {
     const res = await fetch(`${API_BASE_URL}/api/appointments`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
-        doctorId: docId,
-        doctorName: docName,
-        patientName: nameVal,
-        patientEmail: emailVal,
-        patientPhone: phoneVal,
-        dateTime: dateTimeStr
+        doctor: docName,
+        patient_name: nameVal,
+        patient_phone: phoneVal,
+        patient_email: emailVal,
+        appointment_date: selectedDate,
+        appointment_time: selectedTime,
+        appointment_type: 'Online',
+        reason: document.getElementById('appointment-reason')?.value || ''
       })
     });
 
     if (res.ok) {
       const data = await res.json();
-      refId = data.referenceId;
+      if (data.data?.token) refId = data.data.token;
+      else if (data.token) refId = data.token;
     }
   } catch (err) {
-    console.warn("Could not save appointment to backend, saving locally:", err);
-    // Local fallback
+    console.warn("Could not save appointment to backend:", err);
     MOCK_PATIENTS.doctor.push({
       name: nameVal,
       time: selectedTime,
