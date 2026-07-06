@@ -446,9 +446,11 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================================================
 // BACKEND API SYNC CONFIG
 // ==========================================================================
-const API_BASE_URL = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
+// On Vercel: API is on the same domain → use relative URL ''
+// On localhost: API is on port 5001
+const API_BASE_URL = (window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1'))
   ? 'http://localhost:5001'
-  : 'https://upcharr.onrender.com';
+  : '';
 
 async function loadAppointmentsFromBackend() {
   try {

@@ -450,10 +450,18 @@ app.get('*', (req, res) => {
 });
 
 // ══════════════════════════════════════════════════════════
-app.listen(PORT, () => {
-  console.log('==================================================');
-  console.log(`🚀 UPCHAAR BACKEND RUNNING: http://localhost:${PORT}`);
-  console.log(`📦 Database: Supabase PostgreSQL (Cloud)`);
-  console.log(`🔗 ${process.env.SUPABASE_URL}`);
-  console.log('==================================================');
-});
+// START SERVER — local only (Vercel uses module.exports)
+// ══════════════════════════════════════════════════════════
+if (process.env.NODE_ENV !== 'production' || require.main === module) {
+  app.listen(PORT, () => {
+    console.log('==================================================');
+    console.log(`🚀 UPCHAAR BACKEND RUNNING: http://localhost:${PORT}`);
+    console.log(`📦 Database: Supabase PostgreSQL (Cloud)`);
+    console.log(`🔗 ${process.env.SUPABASE_URL}`);
+    console.log('==================================================');
+  });
+}
+
+// Export for Vercel serverless
+module.exports = app;
+
