@@ -1,257 +1,371 @@
 const express = require('express');
 const cors = require('cors');
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
-const dotenv = require('dotenv');
-const { GoogleGenAI } = require('@google/generative-ai');
-
-// Load environment variables
-dotenv.config();
+const { createClient } = require('@supabase/supabase-js');
+const rateLimit = require('express-rate-limit');
+require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
-// Enable CORS and JSON parsing
-app.use(cors());
-app.use(express.json());
+// ── Supabase ──────────────────────────────────────────────
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
-// Initialize SQLite database connection
-const dbPath = path.join(__dirname, 'upchaar.db');
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error('Error opening SQLite database:', err.message);
-  } else {
-    console.log('Connected to SQLite database at:', dbPath);
-    initializeDatabase();
-  }
-});
-
-// Seed data and create tables if not exists
-function initializeDatabase() {
-  db.serialize(() => {
-    // 1. Appointments Table
-    db.run(`
-      CREATE TABLE IF NOT EXISTS appointments (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        reference_id TEXT NOT NULL UNIQUE,
-        doctor_id TEXT NOT NULL,
-        doctor_name TEXT NOT NULL,
-        patient_name TEXT NOT NULL,
-        patient_email TEXT,
-        patient_phone TEXT,
-        date_time TEXT NOT NULL,
-        status TEXT NOT NULL DEFAULT 'Waiting'
-      )
-    `);
-
-    // 2. Queue Status Table
-    db.run(`
-      CREATE TABLE IF NOT EXISTS queue_state (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        active_token TEXT NOT NULL,
-        estimated_wait_mins INTEGER NOT NULL
-      )
-    `);
-
-    // Seed initial queue state if empty
-    db.get('SELECT COUNT(*) as count FROM queue_state', (err, row) => {
-      if (row && row.count === 0) {
-        db.run('INSERT INTO queue_state (active_token, estimated_wait_mins) VALUES (?, ?)', ['#A-14', 12]);
-      }
-    });
-
-    // Seed mock initial appointments if table is empty
-    db.get('SELECT COUNT(*) as count FROM appointments', (err, row) => {
-      if (row && row.count === 0) {
-        const initialAppointments = [
-          { ref: 'UPC-47201', docId: 'dr-sharma', docName: 'Dr. Aarav Sharma', name: 'Rahul Verma', email: 'rahul@gmail.com', phone: '+91 9988776655', time: 'Tomorrow at 09:00 AM', status: 'In Consultation' },
-          { ref: 'UPC-28491', docId: 'dr-sharma', docName: 'Dr. Aarav Sharma', name: 'Priya Sen', email: 'priya@gmail.com', phone: '+91 8877665544', time: 'Tomorrow at 10:00 AM', status: 'Waiting' },
-          { ref: 'UPC-93048', docId: 'dr-mehta', docName: 'Dr. Vikram Mehta', name: 'Amit Sharma', email: 'amit@gmail.com', phone: '+91 7766554433', time: 'Tomorrow at 11:30 AM', status: 'Waiting' }
-        ];
-
-        const stmt = db.prepare('INSERT INTO appointments (reference_id, doctor_id, doctor_name, patient_name, patient_email, patient_phone, date_time, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-        initialAppointments.forEach(app => {
-          stmt.run(app.ref, app.docId, app.docName, app.name, app.email, app.phone, app.time, app.status);
-        });
-        stmt.finalize();
-        console.log('Seeded database with initial mock appointments.');
-      }
-    });
-  });
-}
-
-// ==========================================================================
-// API ENDPOINTS
-// ==========================================================================
-
-// 1. Get all appointments
-app.get('/api/appointments', (req, res) => {
-  db.all('SELECT * FROM appointments ORDER BY id ASC', (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    res.json(rows);
-  });
-});
-
-// 2. Book new appointment
-app.post('/api/appointments', (req, res) => {
-  const { doctorId, doctorName, patientName, patientEmail, patientPhone, dateTime } = req.body;
-
-  if (!doctorId || !doctorName || !patientName || !dateTime) {
-    return res.status(400).json({ error: 'Missing required appointment fields.' });
-  }
-
-  const referenceId = `UPC-${Math.floor(10000 + Math.random() * 90000)}`;
-
-  db.run(
-    `INSERT INTO appointments (reference_id, doctor_id, doctor_name, patient_name, patient_email, patient_phone, date_time) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [referenceId, doctorId, doctorName, patientName, patientEmail || '', patientPhone || '', dateTime],
-    function (err) {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-      res.status(201).json({
-        id: this.lastID,
-        referenceId,
-        doctorId,
-        doctorName,
-        patientName,
-        patientEmail,
-        patientPhone,
-        dateTime,
-        status: 'Waiting'
-      });
-    }
-  );
-});
-
-// 3. Get current queue status
-app.get('/api/queue', (req, res) => {
-  db.get('SELECT * FROM queue_state ORDER BY id DESC LIMIT 1', (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    res.json(row || { active_token: '#A-14', estimated_wait_mins: 12 });
-  });
-});
-
-// 4. Scan check-in (Update queue & checkin list)
-app.post('/api/checkin', (req, res) => {
-  const { patientName, doctorId, doctorName } = req.body;
-
-  if (!patientName) {
-    return res.status(400).json({ error: 'Patient name is required for check-in.' });
-  }
-
-  const referenceId = `UPC-${Math.floor(10000 + Math.random() * 90000)}`;
-  const mockTime = 'Just Checked In';
-
-  db.serialize(() => {
-    // Insert into appointments as lobby checkin
-    db.run(
-      `INSERT INTO appointments (reference_id, doctor_id, doctor_name, patient_name, status, date_time) VALUES (?, ?, ?, ?, ?, ?)`,
-      [referenceId, doctorId || 'dr-sharma', doctorName || 'Dr. Aarav Sharma', patientName, 'Waiting', mockTime]
-    );
-
-    // Update queue active token to simulate check-in progression
-    db.get('SELECT * FROM queue_state ORDER BY id DESC LIMIT 1', (err, row) => {
-      let currentWait = row ? row.estimated_wait_mins : 12;
-      let currentTokenNum = row ? parseInt(row.active_token.split('-')[1]) : 14;
-
-      // Increment wait and token num
-      const nextToken = `#A-${currentTokenNum + 1}`;
-      const nextWait = Math.max(5, currentWait - 1 + Math.floor(Math.random() * 4));
-
-      db.run('UPDATE queue_state SET active_token = ?, estimated_wait_mins = ? WHERE id = 1', [nextToken, nextWait], (updateErr) => {
-        if (updateErr) {
-          return res.status(500).json({ error: updateErr.message });
-        }
-        res.json({
-          status: 'success',
-          checkedInPatient: patientName,
-          nextToken,
-          nextWait,
-          referenceId
-        });
-      });
-    });
-  });
-});
-
-// 5. Secure proxy to Gemini AI chatbot
-app.post('/api/chat', async (req, res) => {
-  const { message } = req.body;
-
-  if (!message) {
-    return res.status(400).json({ error: 'Message is required.' });
-  }
-
-  const apiKey = process.env.GEMINI_API_KEY;
-
-  if (!apiKey) {
-    // If API key is missing, respond with high-quality simulated clinical assistant replies
-    console.warn('GEMINI_API_KEY environment variable is missing. Running in simulated AI mode.');
-    
-    const userMsg = message.toLowerCase();
-    let responseText = "I am Upchaar's AI Assistant. How can I help you today?";
-
-    if (userMsg.includes('fever') || userMsg.includes('temperature')) {
-      responseText = "A fever is typically a sign that your body is fighting off an infection. Please ensure you stay hydrated, get rest, and monitor your temperature. You can book an appointment with Dr. Aarav Sharma (General Physician) for a clinical evaluation.";
-    } else if (userMsg.includes('cough') || userMsg.includes('throat')) {
-      responseText = "If you have a cough or sore throat, resting your voice, staying hydrated with warm liquids, and steam inhalations can help. If it persists for over 5 days, please consult a physician. Dr. Aarav Sharma has open slots tomorrow!";
-    } else if (userMsg.includes('book') || userMsg.includes('appointment')) {
-      responseText = "You can easily schedule a consultation directly on our website! Scroll down to 'Consult Our Verified Clinicians' and click 'Book Now' on any doctor.";
-    } else if (userMsg.includes('doctor') || userMsg.includes('specialist')) {
-      responseText = "Upchaar connects you with verified specialists: Dr. Aarav Sharma (Internal Medicine), Dr. Ananya Patel (Pediatrics), Dr. Vikram Mehta (Cardiology), and Dr. Meera Nene (Gynecology).";
-    } else if (userMsg.includes('abha')) {
-      responseText = "ABHA (Ayushman Bharat Health Account) is a unique digital identity that allows you to store and access your medical histories, lab results, and prescriptions digitally across healthcare networks.";
-    } else if (userMsg.includes('time') || userMsg.includes('timing') || userMsg.includes('hour')) {
-      responseText = "Our physical clinic is open Monday through Saturday, from 8:00 AM to 8:00 PM. AI diagnostics and telemedicine slot booking are online 24/7.";
-    }
-
-    return res.json({ response: responseText });
-  }
-
-  try {
-    // Initialize Gemini AI Client
-    const ai = new GoogleGenAI({ apiKey });
-    const model = ai.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
-    // Set clinical assistant persona system instructions
-    const systemPrompt = `You are Upchaar's intelligent clinic AI Assistant. Keep answers concise, extremely helpful, professional, and medical-focused. Always remind patients that AI insights do not replace real doctor evaluations, and suggest booking an appointment with Upchaar's doctors: Dr. Aarav Sharma (General Physician), Dr. Ananya Patel (Pediatrician), Dr. Vikram Mehta (Cardiologist).`;
-
-    const chatSession = model.startChat({
-      history: [
-        { role: 'user', parts: [{ text: systemPrompt }] },
-        { role: 'model', parts: [{ text: 'Understood. I will act as Upchaar\'s clinic AI assistant.' }] }
-      ]
-    });
-
-    const result = await chatSession.sendMessage(message);
-    const response = await result.response;
-    res.json({ response: response.text() });
-
-  } catch (error) {
-    console.error('Error calling Gemini API:', error);
-    res.status(500).json({ error: 'Failed to communicate with AI model.', details: error.message });
-  }
-});
-
-// ==========================================================================
-// SERVE STATIC FILES
-// ==========================================================================
-// Serve index.html, style.css, app.js statically from root directory
+// ── Middleware ────────────────────────────────────────────
+app.use(cors({ origin: '*', methods: ['GET','POST','PUT','DELETE','OPTIONS'] }));
+app.use(express.json({ limit: '10mb' }));
 app.use(express.static(__dirname));
 
-// Direct any unrecognized route back to index.html (useful for React/frontend routers)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 300 });
+app.use('/api/', limiter);
+
+// ── Health Check ──────────────────────────────────────────
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', database: 'Supabase PostgreSQL', timestamp: new Date().toISOString() });
 });
 
-// Start listening
+// ══════════════════════════════════════════════════════════
+// PATIENTS
+// ══════════════════════════════════════════════════════════
+
+app.get('/api/patients', async (req, res) => {
+  try {
+    const { search } = req.query;
+    let query = supabase.from('patients').select('*').order('created_at', { ascending: false });
+    if (search) query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%,email.ilike.%${search}%`);
+    const { data, error } = await query;
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+app.get('/api/patients/:id', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('patients').select('*, medical_history(*), lab_reports(*)')
+      .eq('id', req.params.id).single();
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+app.post('/api/patients', async (req, res) => {
+  try {
+    const { name, email, phone, date_of_birth, gender, blood_group, address } = req.body;
+    if (!name) return res.status(400).json({ success: false, error: 'Name is required' });
+    const { data, error } = await supabase.from('patients').insert({ name, email, phone, date_of_birth, gender, blood_group, address }).select().single();
+    if (error) throw error;
+    res.status(201).json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+app.put('/api/patients/:id', async (req, res) => {
+  try {
+    const updates = req.body;
+    delete updates.id; delete updates.created_at;
+    const { data, error } = await supabase.from('patients').update(updates).eq('id', req.params.id).select().single();
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+app.delete('/api/patients/:id', async (req, res) => {
+  try {
+    const { error } = await supabase.from('patients').delete().eq('id', req.params.id);
+    if (error) throw error;
+    res.json({ success: true, message: 'Patient deleted' });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+// ══════════════════════════════════════════════════════════
+// APPOINTMENTS
+// ══════════════════════════════════════════════════════════
+
+app.get('/api/appointments', async (req, res) => {
+  try {
+    const { doctor_id, patient_id, status, date } = req.query;
+    let query = supabase.from('appointments')
+      .select('*, patients(name, phone, email), doctors(name, specialty)')
+      .order('date_time', { ascending: true });
+    if (doctor_id) query = query.eq('doctor_id', doctor_id);
+    if (patient_id) query = query.eq('patient_id', patient_id);
+    if (status) query = query.eq('status', status);
+    if (date) query = query.gte('date_time', `${date}T00:00:00`).lte('date_time', `${date}T23:59:59`);
+    const { data, error } = await query;
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+app.post('/api/appointments', async (req, res) => {
+  try {
+    const { patient_name, patient_phone, doctor, department, appointment_date, appointment_time, reason, appointment_type } = req.body;
+
+    // Try to find or create patient
+    let patient_id = null;
+    if (patient_name) {
+      let { data: existing } = await supabase.from('patients').select('id').eq('phone', patient_phone || '').single();
+      if (existing) {
+        patient_id = existing.id;
+      } else {
+        const { data: newPatient } = await supabase.from('patients').insert({ name: patient_name, phone: patient_phone }).select().single();
+        if (newPatient) patient_id = newPatient.id;
+      }
+    }
+
+    // Find doctor by name
+    let doctor_id = null;
+    if (doctor) {
+      const { data: doc } = await supabase.from('doctors').select('id').ilike('name', `%${doctor}%`).single();
+      if (doc) doctor_id = doc.id;
+    }
+
+    const date_time = appointment_date && appointment_time
+      ? `${appointment_date}T${appointment_time}:00`
+      : new Date().toISOString();
+
+    const tokenNumber = `A-${String(Math.floor(Math.random() * 900) + 100)}`;
+
+    const { data, error } = await supabase.from('appointments').insert({
+      patient_id, doctor_id, date_time,
+      status: 'Scheduled',
+      appointment_type: appointment_type || 'Online',
+      reason
+    }).select('*, patients(name), doctors(name)').single();
+
+    if (error) throw error;
+
+    // Add to queue
+    if (doctor_id) {
+      const { data: existing } = await supabase.from('queue').select('position').eq('doctor_id', doctor_id).eq('status', 'Waiting').order('position', { ascending: false }).limit(1);
+      const nextPos = existing && existing.length > 0 ? existing[0].position + 1 : 1;
+      await supabase.from('queue').insert({ appointment_id: data.id, doctor_id, token_number: tokenNumber, position: nextPos });
+    }
+
+    res.status(201).json({ success: true, data: { ...data, token: tokenNumber } });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+app.put('/api/appointments/:id', async (req, res) => {
+  try {
+    const updates = req.body;
+    delete updates.id; delete updates.created_at;
+    const { data, error } = await supabase.from('appointments').update(updates).eq('id', req.params.id).select().single();
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+app.delete('/api/appointments/:id', async (req, res) => {
+  try {
+    const { error } = await supabase.from('appointments').delete().eq('id', req.params.id);
+    if (error) throw error;
+    res.json({ success: true, message: 'Appointment cancelled' });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+// ══════════════════════════════════════════════════════════
+// QUEUE
+// ══════════════════════════════════════════════════════════
+
+app.get('/api/queue', async (req, res) => {
+  try {
+    const { doctor_id } = req.query;
+    let query = supabase.from('queue')
+      .select('*, appointments(*, patients(name, phone)), doctors(name)')
+      .in('status', ['Waiting', 'Calling'])
+      .order('position', { ascending: true });
+    if (doctor_id) query = query.eq('doctor_id', doctor_id);
+    const { data, error } = await query;
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+app.post('/api/queue/checkin', async (req, res) => {
+  try {
+    const { token_number } = req.body;
+    const { data, error } = await supabase.from('queue')
+      .select('*, appointments(*, patients(name))')
+      .eq('token_number', token_number).single();
+    if (error || !data) return res.status(404).json({ success: false, error: 'Token not found' });
+    res.json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+app.put('/api/queue/:id/call', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('queue').update({ status: 'Calling' }).eq('id', req.params.id).select().single();
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+app.put('/api/queue/:id/complete', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('queue').update({ status: 'Completed' }).eq('id', req.params.id).select().single();
+    if (error) throw error;
+    if (data?.appointment_id) {
+      await supabase.from('appointments').update({ status: 'Completed' }).eq('id', data.appointment_id);
+    }
+    res.json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+// ══════════════════════════════════════════════════════════
+// DOCTORS
+// ══════════════════════════════════════════════════════════
+
+app.get('/api/doctors', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('doctors').select('*').eq('is_available', true);
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+// ══════════════════════════════════════════════════════════
+// AI CHAT (Gemini)
+// ══════════════════════════════════════════════════════════
+
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { message, language } = req.body;
+    if (!message) return res.status(400).json({ success: false, error: 'Message required' });
+
+    let reply;
+    try {
+      const { GoogleGenerativeAI } = require('@google/generative-ai');
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const prompt = `You are Upchaar AI, a professional healthcare assistant for an Indian clinic management platform.
+      Respond in ${language === 'hi' ? 'Hindi' : language === 'mr' ? 'Marathi' : 'English'}.
+      User message: "${message}"
+      Provide helpful, empathetic, concise medical guidance. Always remind to consult a doctor for serious issues.`;
+      const result = await model.generateContent(prompt);
+      reply = result.response.text();
+    } catch (aiErr) {
+      // Fallback responses
+      const msg = message.toLowerCase();
+      if (msg.includes('fever') || msg.includes('bukhar')) reply = 'Fever above 38°C needs attention. Stay hydrated and rest. If fever persists more than 3 days or goes above 40°C, please visit a doctor immediately.';
+      else if (msg.includes('appointment') || msg.includes('book')) reply = 'You can book an appointment by clicking "Book Appointment" button. Choose your doctor, date, and time. You will receive a token number for the queue!';
+      else if (msg.includes('abha')) reply = 'ABHA (Ayushman Bharat Health Account) is your digital health ID. Enter your 14-digit ABHA number in the Digital Health Locker section to link your health records.';
+      else if (msg.includes('queue') || msg.includes('wait')) reply = 'You can check the live queue in the Queue Status section. When your token is called, please proceed to the doctor\'s cabin.';
+      else reply = 'I\'m Upchaar AI, your healthcare assistant. I can help you with appointments, health tips, ABHA integration, and general health queries. How can I assist you today?';
+    }
+
+    // Log to Supabase
+    await supabase.from('audit_logs').insert({ action: 'AI_CHAT', table_name: 'chat', details: `Q: ${message.substring(0, 100)}` }).catch(() => {});
+
+    res.json({ success: true, reply });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+// ══════════════════════════════════════════════════════════
+// BILLING
+// ══════════════════════════════════════════════════════════
+
+app.get('/api/billing', async (req, res) => {
+  try {
+    const { patient_id } = req.query;
+    let query = supabase.from('billing').select('*, patients(name, phone), payments(*)').order('created_at', { ascending: false });
+    if (patient_id) query = query.eq('patient_id', patient_id);
+    const { data, error } = await query;
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+app.post('/api/billing', async (req, res) => {
+  try {
+    const { appointment_id, patient_id, total_amount, discount } = req.body;
+    const { data, error } = await supabase.from('billing').insert({ appointment_id, patient_id, total_amount, discount: discount || 0 }).select().single();
+    if (error) throw error;
+    res.status(201).json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+// ══════════════════════════════════════════════════════════
+// ANALYTICS
+// ══════════════════════════════════════════════════════════
+
+app.get('/api/analytics', async (req, res) => {
+  try {
+    const [
+      { count: totalPatients },
+      { count: totalAppointments },
+      { count: todayAppointments },
+      { data: revenue }
+    ] = await Promise.all([
+      supabase.from('patients').select('*', { count: 'exact', head: true }),
+      supabase.from('appointments').select('*', { count: 'exact', head: true }),
+      supabase.from('appointments').select('*', { count: 'exact', head: true }).gte('date_time', new Date().toISOString().split('T')[0] + 'T00:00:00'),
+      supabase.from('billing').select('total_amount, discount').eq('status', 'Paid')
+    ]);
+    const totalRevenue = (revenue || []).reduce((s, b) => s + (b.total_amount - b.discount), 0);
+    res.json({ success: true, data: { totalPatients, totalAppointments, todayAppointments, totalRevenue } });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+// ══════════════════════════════════════════════════════════
+// PRESCRIPTIONS
+// ══════════════════════════════════════════════════════════
+
+app.get('/api/prescriptions', async (req, res) => {
+  try {
+    const { patient_id } = req.query;
+    let query = supabase.from('prescriptions').select('*, patients(name), doctors(name), prescription_items(*)').order('created_at', { ascending: false });
+    if (patient_id) query = query.eq('patient_id', patient_id);
+    const { data, error } = await query;
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+app.post('/api/prescriptions', async (req, res) => {
+  try {
+    const { appointment_id, doctor_id, patient_id, diagnosis, advice, follow_up_date } = req.body;
+    const { data, error } = await supabase.from('prescriptions').insert({ appointment_id, doctor_id, patient_id, diagnosis, advice, follow_up_date }).select().single();
+    if (error) throw error;
+    res.status(201).json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+// ══════════════════════════════════════════════════════════
+// NOTIFICATIONS
+// ══════════════════════════════════════════════════════════
+
+app.post('/api/notifications', async (req, res) => {
+  try {
+    const { title, message, type } = req.body;
+    const { data, error } = await supabase.from('notifications').insert({ title, message, type: type || 'General' }).select().single();
+    if (error) throw error;
+    res.status(201).json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+app.get('/api/notifications', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('notifications').select('*').order('created_at', { ascending: false }).limit(20);
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+// ══════════════════════════════════════════════════════════
+// Serve static frontend (original index.html)
+// ══════════════════════════════════════════════════════════
+app.get('*', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
+
+// ══════════════════════════════════════════════════════════
 app.listen(PORT, () => {
-  console.log(`==================================================`);
+  console.log('==================================================');
   console.log(`🚀 UPCHAAR BACKEND RUNNING: http://localhost:${PORT}`);
-  console.log(`==================================================`);
+  console.log(`📦 Database: Supabase PostgreSQL (Cloud)`);
+  console.log(`🔗 ${process.env.SUPABASE_URL}`);
+  console.log('==================================================');
 });
