@@ -43,13 +43,15 @@ app.post('/api/auth/register', async (req, res) => {
 
     // Also insert into patients or staff table
     const userId = authData.user.id;
-    if (role === 'patient' || !role) {
-      await supabase.from('patients').insert({ user_id: userId, name, email }).catch(() => {});
-    } else if (role === 'doctor') {
-      await supabase.from('doctors').insert({ user_id: userId, name, email }).catch(() => {});
-    } else {
-      await supabase.from('staff').insert({ user_id: userId, name, email, role }).catch(() => {});
-    }
+    try {
+      if (role === 'patient' || !role) {
+        await supabase.from('patients').insert({ user_id: userId, name, email });
+      } else if (role === 'doctor') {
+        await supabase.from('doctors').insert({ user_id: userId, name, email });
+      } else {
+        await supabase.from('staff').insert({ user_id: userId, name, email, role });
+      }
+    } catch (_) { /* ignore profile insert errors */ }
 
     res.status(201).json({ success: true, message: 'Account created. You can now sign in.' });
   } catch (err) { res.status(400).json({ error: err.message }); }
