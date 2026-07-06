@@ -10,10 +10,6 @@
       "use": "@vercel/static"
     },
     {
-      "src": "login.html",
-      "use": "@vercel/static"
-    },
-    {
       "src": "style.css",
       "use": "@vercel/static"
     },
@@ -38,10 +34,6 @@
     {
       "src": "/app.js",
       "dest": "/app.js"
-    },
-    {
-      "src": "/login.html",
-      "dest": "/login.html"
     },
     {
       "src": "/(.*)",
