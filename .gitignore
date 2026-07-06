@@ -1,4 +1,9 @@
 node_modules/
 upchaar.db
 .env
+.env.local
+.env.production
 .DS_Store
+dist/
+.next/
+*.log
