@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root {
   --teal: #00B3A4;
@@ -11,7 +9,11 @@
   --text-muted: #6B7280;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
   background: #ffffff;
@@ -26,13 +28,6 @@ body {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.glass-dark {
-  background: rgba(17, 24, 39, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Gradient text */
@@ -63,43 +58,150 @@ body {
 .animate-fade-in { animation: fadeInUp 0.5s ease-out; }
 .pulse-teal { animation: pulse-teal 2s infinite; }
 
-/* Dashboard sidebar */
+/* Sidebar */
 .sidebar-item {
-  @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  color: #4B5563;
 }
-.sidebar-item:hover { @apply bg-teal-50 text-teal-700; }
-.sidebar-item.active { @apply bg-teal-500 text-white shadow-lg shadow-teal-500/30; }
+.sidebar-item:hover {
+  background-color: #f0fdfa;
+  color: #0f766e;
+}
+.sidebar-item.active {
+  background-color: #14b8a6;
+  color: #ffffff;
+  box-shadow: 0 10px 15px -3px rgba(20, 184, 166, 0.3);
+}
 
-/* Cards */
+/* Stat card */
 .stat-card {
-  @apply bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200;
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 1px solid #f3f4f6;
+  transition: box-shadow 0.2s;
+}
+.stat-card:hover {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07);
 }
 
-/* Forms */
+/* Form inputs */
 .form-input {
-  @apply w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all text-sm;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  outline: none;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  background: #ffffff;
+  color: #111827;
+}
+.form-input:focus {
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
 }
 
+/* Buttons */
 .btn-primary {
-  @apply px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-teal-500/30 active:scale-95;
+  padding: 0.75rem 1.5rem;
+  background-color: #14b8a6;
+  color: #ffffff;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px rgba(20, 184, 166, 0.3);
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
 }
+.btn-primary:hover { background-color: #0d9488; }
+.btn-primary:active { transform: scale(0.97); }
 
 .btn-secondary {
-  @apply px-6 py-3 bg-white hover:bg-gray-50 text-gray-700 rounded-xl font-semibold border border-gray-200 transition-all duration-200 active:scale-95;
+  padding: 0.75rem 1.5rem;
+  background-color: #ffffff;
+  color: #374151;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
 }
+.btn-secondary:hover { background-color: #f9fafb; }
+.btn-secondary:active { transform: scale(0.97); }
 
-/* Table */
+/* Data Table */
 .data-table th {
-  @apply px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide bg-gray-50;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: #f9fafb;
 }
 .data-table td {
-  @apply px-4 py-4 text-sm text-gray-900 border-t border-gray-50;
+  padding: 1rem;
+  font-size: 0.875rem;
+  color: #111827;
+  border-top: 1px solid #f9fafb;
 }
-.data-table tr:hover td { @apply bg-teal-50/30; }
+.data-table tr:hover td { background-color: rgba(240, 253, 250, 0.5); }
 
 /* Status badges */
-.badge-confirmed { @apply bg-teal-100 text-teal-700 px-3 py-1 rounded-full text-xs font-semibold; }
-.badge-pending { @apply bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-semibold; }
-.badge-completed { @apply bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold; }
-.badge-cancelled { @apply bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold; }
-.badge-calling { @apply bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-semibold pulse-teal; }
+.badge-confirmed {
+  background: #ccfbf1;
+  color: #0f766e;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.badge-pending {
+  background: #fef9c3;
+  color: #a16207;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.badge-completed {
+  background: #dcfce7;
+  color: #15803d;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.badge-cancelled {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.badge-calling {
+  background: #fed7aa;
+  color: #c2410c;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  animation: pulse-teal 2s infinite;
+}
